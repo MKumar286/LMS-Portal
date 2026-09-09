@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerGraspp - Student Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1e3a8a;
+      --primary-hover: #1d4ed8;
+      --bg-light: #f1f5f9;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --accent-green: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #ffffff;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .brand-logo {
+      background: #090d16;
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-logo span {
+      color: #3b82f6;
+    }
+
+    /* Container */
+    .container {
+      max-width: 500px;
+      width: 100%;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Alert Message */
+    .status-msg {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: none;
+      text-align: center;
+    }
+
+    .status-msg.success {
+      background: #d1fae5;
+      color: #065f46;
+      display: block;
+    }
+
+    .status-msg.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="navbar">
+    <div class="brand-logo">
+      CAREER <span>GRASPP</span>
+    </div>
+  </header>
+
+  <!-- Registration Form Card -->
+  <main class="container">
+    <h2>Student Registration</h2>
+    <p class="subtitle">Select your college and complete your profile.</p>
+
+    <div id="statusMsg" class="status-msg"></div>
+
+    <form id="registrationForm">
+      
+      <!-- Select College -->
+      <div class="form-group">
+        <label for="collegeId">Select College</label>
+        <select id="collegeId" required>
+          <option value="">-- Select Your College --</option>
+          <option value="COL_001">Apex Institute of Technology</option>
+          <option value="COL_002">Beacon College of Engineering</option>
+          <option value="COL_003">Crestview University</option>
+        </select>
+      </div>
+
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" placeholder="Enter your full name" required>
+      </div>
+
+      <!-- Email Address -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="student@example.com" required>
+      </div>
+
+      <!-- Roll Number -->
+      <div class="form-group">
+        <label for="rollNumber">Roll Number</label>
+        <input type="text" id="rollNumber" placeholder="e.g., 21001A0501" required>
+      </div>
+
+      <!-- Branch / Department -->
+      <div class="form-group">
+        <label for="branch">Branch / Department</label>
+        <input type="text" id="branch" placeholder="e.g., Computer Science / CSE" required>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Register Student Profile</button>
+    </form>
+  </main>
+
+  <!-- Firebase Web SDK v10 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 1. REPLACE THIS WITH YOUR FIREBASE CONFIG FROM FIREBASE CONSOLE
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // 2. Initialize Firebase & Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3. Handle Form Submission
+    const form = document.getElementById('registrationForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // UI state
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Registering...";
+      statusMsg.className = "status-msg";
+      statusMsg.style.display = "none";
+
+      const collegeId = document.getElementById('collegeId').value;
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const rollNumber = document.getElementById('rollNumber').value.trim();
+      const branch = document.getElementById('branch').value.trim();
+
+      try {
+        // Save to Firestore "students" collection
+        const docRef = await addDoc(collection(db, "students"), {
+          college_id: collegeId,
+          full_name: fullName,
+          email: email,
+          roll_number: rollNumber,
+          branch: branch,
+          created_at: serverTimestamp()
+        });
+
+        // Show Success
+        statusMsg.innerText = "Profile created successfully! Document ID: " + docRef.id;
+        statusMsg.classList.add('success');
+        form.reset();
+
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        statusMsg.innerText = "Error creating profile: " + error.message;
+        statusMsg.classList.add('error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Register Student Profile";
+      }
+    });
+  </script>
+</body>
+</html>
