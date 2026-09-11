@@ -8,14 +8,43 @@
 </head>
 <body class="bg-gray-100 font-sans">
 
-  <div class="flex h-screen">
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="login-screen" class="flex min-h-screen items-center justify-center bg-slate-900 px-4">
+    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl">
+      <h2 class="text-2xl font-bold text-center text-slate-900 mb-6">Super Admin Login</h2>
+      <div id="auth-error" class="hidden mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-lg"></div>
+      
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email Address</label>
+          <input type="email" id="login-email" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="admin@domain.com" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="login-password" required class="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="••••••••" />
+        </div>
+        <button type="submit" id="login-btn" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD SCREEN ================= -->
+  <div id="dashboard-screen" class="hidden flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col p-5">
-      <h1 class="text-2xl font-bold mb-8 text-indigo-400">LMS SuperAdmin</h1>
-      <nav class="space-y-4">
-        <a href="#courses" onclick="showSection('courses-section')" class="block py-2 px-4 rounded hover:bg-slate-800">Manage Courses</a>
-        <a href="#colleges" onclick="showSection('colleges-section')" class="block py-2 px-4 rounded hover:bg-slate-800">Manage Colleges</a>
-      </nav>
+    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between p-5">
+      <div>
+        <h1 class="text-2xl font-bold mb-8 text-indigo-400">LMS SuperAdmin</h1>
+        <nav class="space-y-2">
+          <button onclick="showSection('courses-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition">Manage Courses</button>
+          <button onclick="showSection('colleges-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition">Manage Colleges</button>
+        </nav>
+      </div>
+
+      <!-- User Profile & Sign Out -->
+      <div class="border-t border-slate-700 pt-4">
+        <p id="user-email-display" class="text-xs text-gray-400 truncate mb-2"></p>
+        <button id="logout-btn" class="w-full py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded text-sm transition font-medium">Log Out</button>
+      </div>
     </aside>
 
     <!-- Main Content Area -->
@@ -23,13 +52,10 @@
       
       <!-- Manage Courses Section -->
       <section id="courses-section" class="space-y-6">
-        <div class="flex justify-between items-center">
-          <h2 class="text-3xl font-bold text-gray-800">Course Management</h2>
-        </div>
-
-        <!-- Add Course Form -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold mb-4">Add New Course</h3>
+        <h2 class="text-3xl font-bold text-gray-800">Course Management</h2>
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold mb-4 text-gray-800">Add New Course</h3>
           <form id="add-course-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Course Title</label>
@@ -53,20 +79,17 @@
           </form>
         </div>
 
-        <!-- Course List -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold mb-4">Published Courses</h3>
-          <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Courses rendered dynamically -->
-          </div>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold mb-4 text-gray-800">Published Courses</h3>
+          <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
       </section>
 
       <!-- Manage Colleges Section -->
       <section id="colleges-section" class="space-y-6 hidden">
         <h2 class="text-3xl font-bold text-gray-800">College Onboarding</h2>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold mb-4">Register New College</h3>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-xl font-semibold mb-4 text-gray-800">Register New College</h3>
           <form id="add-college-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">College Code / ID (Unique)</label>
@@ -84,34 +107,105 @@
     </main>
   </div>
 
-  <!-- Firebase Script -->
+  <!-- Firebase Script Module -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      setDoc, 
+      doc, 
+      getDoc,
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Replace with your Firebase Project Configuration
+    // 1. YOUR FIREBASE CONFIG
     const firebaseConfig = {
-      apiKey: ""AIzaSyCga9Taij7xAz1UtfnVGaHiEGfYc9N4ROU"",
-      authDomain: "lms-portal-careergraspp.firebaseapp.com",
-      projectId:"lms-portal-careergraspp",
-      storageBucket: "lms-portal-careergraspp.firebasestorage.app",
-      messagingSenderId: "175460420645",
-      appId: "1:175460420645:web:9fe41933926ccb1b4543cc"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
-    // Dynamic Navigation
+    const loginScreen = document.getElementById('login-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
+    const authError = document.getElementById('auth-error');
+    const userEmailDisplay = document.getElementById('user-email-display');
+
+    // 2. AUTH STATE MONITORING (AUTH GUARD)
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Verify user role in Firestore before granting entry
+        try {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists() && userDoc.data().role === "super_admin") {
+            // Authorized
+            loginScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('hidden');
+            userEmailDisplay.textContent = user.email;
+            loadCourses();
+          } else {
+            // Not a Super Admin -> Force logout
+            await signOut(auth);
+            showError("Access Denied: You do not have Super Admin permissions.");
+          }
+        } catch (err) {
+          showError("Authorization check failed: " + err.message);
+        }
+      } else {
+        // Logged out state
+        dashboardScreen.classList.add('hidden');
+        loginScreen.classList.remove('hidden');
+      }
+    });
+
+    // 3. LOGIN FORM SUBMISSION
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.classList.add('hidden');
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        showError("Invalid credentials: " + error.message);
+      }
+    });
+
+    // 4. LOGOUT ACTION
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    function showError(msg) {
+      authError.textContent = msg;
+      authError.classList.remove('hidden');
+    }
+
+    // Navigation Toggle
     window.showSection = function(sectionId) {
       document.getElementById('courses-section').classList.add('hidden');
       document.getElementById('colleges-section').classList.add('hidden');
       document.getElementById(sectionId).classList.remove('hidden');
     };
 
-    // Add Course
+    // 5. FIRESTORE ACTIONS (COURSES & COLLEGES)
     const courseForm = document.getElementById('add-course-form');
     courseForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -123,14 +217,13 @@
           pdfUrl: document.getElementById('course-pdf').value,
           createdAt: new Date()
         });
-        alert("Course published successfully!");
+        alert("Course published!");
         courseForm.reset();
       } catch (error) {
-        console.error("Error adding course: ", error);
+        alert("Error publishing course: " + error.message);
       }
     });
 
-    // Add College
     const collegeForm = document.getElementById('add-college-form');
     collegeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -144,28 +237,29 @@
         alert("College registered!");
         collegeForm.reset();
       } catch (error) {
-        console.error("Error adding college: ", error);
+        alert("Error registering college: " + error.message);
       }
     });
 
-    // Live Render Courses
-    onSnapshot(collection(db, "courses"), (snapshot) => {
-      const container = document.getElementById('course-list');
-      container.innerHTML = "";
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        container.innerHTML += `
-          <div class="border border-gray-200 p-4 rounded-lg bg-gray-50">
-            <h4 class="font-bold text-lg text-indigo-900">${data.title}</h4>
-            <p class="text-sm text-gray-600 mb-2">${data.description}</p>
-            <div class="flex space-x-2 text-xs">
-              ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-500 underline">Watch Video</a>` : ''}
-              ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-500 underline">View PDF</a>` : ''}
+    function loadCourses() {
+      onSnapshot(collection(db, "courses"), (snapshot) => {
+        const container = document.getElementById('course-list');
+        container.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          container.innerHTML += `
+            <div class="border border-gray-200 p-4 rounded-lg bg-gray-50">
+              <h4 class="font-bold text-lg text-indigo-900">${data.title}</h4>
+              <p class="text-sm text-gray-600 mb-2">${data.description}</p>
+              <div class="flex space-x-2 text-xs">
+                ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-500 underline">Watch Video</a>` : ''}
+                ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-500 underline">View PDF</a>` : ''}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        });
       });
-    });
+    }
   </script>
 </body>
 </html>
