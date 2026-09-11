@@ -1,102 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Superadmin Portal - Course Manager</title>
-  <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f0f2f5; margin: 0; padding: 20px; }
-    .container { max-width: 1000px; margin: 0 auto; }
-    h1 { color: #1a73e8; }
-    .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 25px; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; font-weight: bold; margin-bottom: 5px; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
-    .btn { background: #1a73e8; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn:hover { background: #1557b0; }
-    .btn-secondary { background: #34a853; }
-    .quiz-question { background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
-    th { background: #f8f9fa; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LMS Super Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-<div class="container">
-  <h1>Superadmin Portal</h1>
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col p-5">
+      <h1 class="text-2xl font-bold mb-8 text-indigo-400">LMS SuperAdmin</h1>
+      <nav class="space-y-4">
+        <a href="#courses" onclick="showSection('courses-section')" class="block py-2 px-4 rounded hover:bg-slate-800">Manage Courses</a>
+        <a href="#colleges" onclick="showSection('colleges-section')" class="block py-2 px-4 rounded hover:bg-slate-800">Manage Colleges</a>
+      </nav>
+    </aside>
 
-  <!-- 1. CREATE NEW COURSE -->
-  <div class="card">
-    <h2>1. Create a New Course</h2>
-    <div class="form-group">
-      <label>Course Title</label>
-      <input type="text" id="courseTitle" placeholder="e.g., Aptitude & Reasoning Masterclass">
-    </div>
-    <div class="form-group">
-      <label>Course Description</label>
-      <textarea id="courseDesc" rows="2" placeholder="Brief details about the course..."></textarea>
-    </div>
-    <button class="btn" id="createCourseBtn">Create Course</button>
+    <!-- Main Content Area -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      
+      <!-- Manage Courses Section -->
+      <section id="courses-section" class="space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="text-3xl font-bold text-gray-800">Course Management</h2>
+        </div>
+
+        <!-- Add Course Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-4">Add New Course</h3>
+          <form id="add-course-form" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Course Title</label>
+              <input type="text" id="course-title" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., Aptitude Masterclass" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="course-desc" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Course details..."></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Video Lesson URL</label>
+                <input type="url" id="course-video" class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="https://..." />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">PDF Material URL</label>
+                <input type="url" id="course-pdf" class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="https://..." />
+              </div>
+            </div>
+            <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700">Publish Course</button>
+          </form>
+        </div>
+
+        <!-- Course List -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-4">Published Courses</h3>
+          <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Courses rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Manage Colleges Section -->
+      <section id="colleges-section" class="space-y-6 hidden">
+        <h2 class="text-3xl font-bold text-gray-800">College Onboarding</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold mb-4">Register New College</h3>
+          <form id="add-college-form" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">College Code / ID (Unique)</label>
+              <input type="text" id="college-id" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., jntu_hyd" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">College Full Name</label>
+              <input type="text" id="college-name" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., JNTU Hyderabad" />
+            </div>
+            <button type="submit" class="bg-emerald-600 text-white px-5 py-2 rounded-md hover:bg-emerald-700">Register College</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <!-- 2. ADD CONTENT TO COURSE -->
-  <div class="card">
-    <h2>2. Upload Content (Video / PDF / Quiz / Test)</h2>
-    
-    <div class="form-group">
-      <label>Select Target Course</label>
-      <select id="courseSelect">
-        <option value="">-- Loading Courses --</option>
-      </select>
-    </div>
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    <div class="form-group">
-      <label>Content Type</label>
-      <select id="contentType">
-        <option value="video">Video Lesson (YouTube / Drive Link)</option>
-        <option value="pdf">PDF Resource (Document Link)</option>
-        <option value="quiz">Interactive Quiz / Test</option>
-      </select>
-    </div>
+    // Replace with your Firebase Project Configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-    <div class="form-group">
-      <label>Title of Content / Lesson</label>
-      <input type="text" id="contentTitle" placeholder="e.g., Chapter 1: Time & Work">
-    </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    <!-- Dynamic Section for Videos / PDFs -->
-    <div id="mediaSection" class="form-group">
-      <label>File URL / Embed Link</label>
-      <input type="url" id="contentUrl" placeholder="https://...">
-    </div>
+    // Dynamic Navigation
+    window.showSection = function(sectionId) {
+      document.getElementById('courses-section').classList.add('hidden');
+      document.getElementById('colleges-section').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+    };
 
-    <!-- Dynamic Section for Quizzes & Tests -->
-    <div id="quizSection" style="display: none;">
-      <h3>Quiz Questions</h3>
-      <div id="questionsContainer"></div>
-      <button type="button" class="btn btn-secondary" id="addQuestionBtn" style="margin-bottom: 15px;">+ Add Question</button>
-    </div>
+    // Add Course
+    const courseForm = document.getElementById('add-course-form');
+    courseForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await addDoc(collection(db, "courses"), {
+          title: document.getElementById('course-title').value,
+          description: document.getElementById('course-desc').value,
+          videoUrl: document.getElementById('course-video').value,
+          pdfUrl: document.getElementById('course-pdf').value,
+          createdAt: new Date()
+        });
+        alert("Course published successfully!");
+        courseForm.reset();
+      } catch (error) {
+        console.error("Error adding course: ", error);
+      }
+    });
 
-    <button class="btn" id="publishContentBtn">Publish Content to Course</button>
-  </div>
+    // Add College
+    const collegeForm = document.getElementById('add-college-form');
+    collegeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const collegeId = document.getElementById('college-id').value.toLowerCase().trim();
+      const collegeName = document.getElementById('college-name').value;
+      try {
+        await setDoc(doc(db, "colleges", collegeId), {
+          name: collegeName,
+          createdAt: new Date()
+        });
+        alert("College registered!");
+        collegeForm.reset();
+      } catch (error) {
+        console.error("Error adding college: ", error);
+      }
+    });
 
-  <!-- 3. EXISTING COURSES OVERVIEW -->
-  <div class="card">
-    <h2>3. Live Courses Overview</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Course ID</th>
-          <th>Title</th>
-          <th>Total Modules</th>
-        </tr>
-      </thead>
-      <tbody id="coursesTableBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<script type="module" src="admin.js"></script>
+    // Live Render Courses
+    onSnapshot(collection(db, "courses"), (snapshot) => {
+      const container = document.getElementById('course-list');
+      container.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        container.innerHTML += `
+          <div class="border border-gray-200 p-4 rounded-lg bg-gray-50">
+            <h4 class="font-bold text-lg text-indigo-900">${data.title}</h4>
+            <p class="text-sm text-gray-600 mb-2">${data.description}</p>
+            <div class="flex space-x-2 text-xs">
+              ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-500 underline">Watch Video</a>` : ''}
+              ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-500 underline">View PDF</a>` : ''}
+            </div>
+          </div>
+        `;
+      });
+    });
+  </script>
 </body>
 </html>
