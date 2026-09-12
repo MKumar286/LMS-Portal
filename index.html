@@ -64,8 +64,8 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Description / Highlights (Each line becomes a bullet point)</label>
-              <textarea id="course-desc" rows="4" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Complete placement preparation&#10;50+ Video Modules&#10;Downloadable PDF notes"></textarea>
+              <label class="block text-sm font-medium text-gray-700">Description / Complete Syllabus (Supports 50+ lines)</label>
+              <textarea id="course-desc" rows="6" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Enter detailed description, modules, outcomes..."></textarea>
             </div>
 
             <!-- THUMBNAIL IMAGE SOURCE OPTION -->
@@ -82,7 +82,6 @@
                 </label>
               </div>
 
-              <!-- Image Inputs -->
               <div id="image-file-container">
                 <input type="file" id="course-image-file" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
               </div>
@@ -101,16 +100,15 @@
                 </label>
                 <label class="inline-flex items-center cursor-pointer">
                   <input type="radio" name="video-source-type" value="url" onchange="toggleInputMode('video', 'url')" class="text-indigo-600 focus:ring-indigo-500" />
-                  <span class="ml-2 text-gray-700 font-medium">External Link (YouTube / Drive)</span>
+                  <span class="ml-2 text-gray-700 font-medium">External Link (MP4 / Drive Link)</span>
                 </label>
               </div>
 
-              <!-- Video Inputs -->
               <div id="video-file-container">
                 <input type="file" id="course-video-file" accept="video/*" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
               </div>
               <div id="video-url-container" class="hidden">
-                <input type="url" id="course-video-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://www.youtube.com/watch?v=..." />
+                <input type="url" id="course-video-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://..." />
               </div>
             </div>
 
@@ -128,12 +126,11 @@
                 </label>
               </div>
 
-              <!-- PDF Inputs -->
               <div id="pdf-file-container">
                 <input type="file" id="course-pdf-file" accept="application/pdf" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
               </div>
               <div id="pdf-url-container" class="hidden">
-                <input type="url" id="course-pdf-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://drive.google.com/file/d/..." />
+                <input type="url" id="course-pdf-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://drive.google.com/..." />
               </div>
             </div>
 
@@ -172,6 +169,78 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- ================= FULL PAGE COURSE VIEWER MODAL ================= -->
+  <div id="full-course-viewer" class="hidden fixed inset-0 bg-slate-900/95 z-50 overflow-y-auto p-4 md:p-10">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[90vh] flex flex-col justify-between">
+      
+      <!-- Top Header Bar -->
+      <div class="bg-slate-900 text-white p-6 flex justify-between items-center border-b border-slate-800">
+        <button onclick="closeFullCourseView()" class="inline-flex items-center text-indigo-400 hover:text-white font-semibold text-sm transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          Back to Dashboard
+        </button>
+        <span class="text-xs bg-indigo-600 px-3 py-1 rounded-full font-semibold">Course Preview</span>
+      </div>
+
+      <!-- Course Content Body -->
+      <div class="p-8 space-y-8 flex-1">
+        
+        <!-- Title & Banner -->
+        <div class="space-y-4">
+          <div id="viewer-image-container" class="h-64 w-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+            <img id="viewer-image" src="" alt="Course Cover" class="w-full h-full object-cover" />
+          </div>
+          <h1 id="viewer-title" class="text-3xl font-extrabold text-gray-900"></h1>
+        </div>
+
+        <!-- Detailed Description Section (Full multi-line support) -->
+        <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl space-y-2">
+          <h3 class="text-lg font-bold text-gray-900 border-b pb-2">About This Course & Complete Description</h3>
+          <p id="viewer-desc" class="text-gray-700 text-base leading-relaxed whitespace-pre-line pt-2"></p>
+        </div>
+
+        <!-- Video Modules Section -->
+        <div class="space-y-4 border-t pt-6">
+          <h3 class="text-2xl font-bold text-gray-900 flex items-center">
+            <svg class="w-7 h-7 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Video Modules & Lesson Materials
+          </h3>
+
+          <div class="bg-slate-900 rounded-2xl p-6 text-white space-y-4">
+            <div id="video-player-container">
+              <!-- Video Element with Streamline Controls -->
+              <video id="viewer-video-player" controls controlsList="nodownload" class="w-full rounded-xl shadow-lg bg-black aspect-video">
+                <source id="viewer-video-source" src="" type="video/mp4" />
+                Your browser does not support HTML5 video playback.
+              </video>
+            </div>
+
+            <!-- Custom Playback Controls & Speed Settings -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-800 text-sm">
+              <div class="flex items-center space-x-2">
+                <span class="text-slate-400 font-medium">Playback Speed:</span>
+                <button onclick="setVideoSpeed(0.75)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold">0.75x</button>
+                <button onclick="setVideoSpeed(1.0)" class="px-2.5 py-1 bg-indigo-600 rounded text-xs font-semibold">1.0x (Normal)</button>
+                <button onclick="setVideoSpeed(1.25)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold">1.25x</button>
+                <button onclick="setVideoSpeed(1.5)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold">1.5x</button>
+                <button onclick="setVideoSpeed(2.0)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold">2.0x</button>
+              </div>
+
+              <!-- Associated PDF Document Button -->
+              <div id="viewer-pdf-container">
+                <a id="viewer-pdf-btn" href="#" target="_blank" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  View Related PDF Material
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Firebase Script Module -->
@@ -218,8 +287,11 @@
     const dashboardScreen = document.getElementById('dashboard-screen');
     const authError = document.getElementById('auth-error');
     const userEmailDisplay = document.getElementById('user-email-display');
+    
+    // Store courses locally in memory for modal reference
+    let currentCoursesCache = {};
 
-    // 2. EXPOSE GLOBAL TOGGLE FUNCTIONS
+    // 2. EXPOSE GLOBAL UI FUNCTIONS
     window.showSection = function(sectionId) {
       document.getElementById('courses-section').classList.add('hidden');
       document.getElementById('colleges-section').classList.add('hidden');
@@ -237,6 +309,51 @@
         fileContainer.classList.add('hidden');
         urlContainer.classList.remove('hidden');
       }
+    };
+
+    window.openFullCourseView = function(courseId) {
+      const course = currentCoursesCache[courseId];
+      if (!course) return;
+
+      const defaultImg = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop";
+      
+      document.getElementById('viewer-title').textContent = course.title;
+      document.getElementById('viewer-desc').textContent = course.description;
+      document.getElementById('viewer-image').src = course.imageUrl || defaultImg;
+
+      // Video Source Setup
+      const videoPlayer = document.getElementById('viewer-video-player');
+      const videoSource = document.getElementById('viewer-video-source');
+      if (course.videoUrl) {
+        videoSource.src = course.videoUrl;
+        videoPlayer.load();
+        document.getElementById('video-player-container').classList.remove('hidden');
+      } else {
+        videoSource.src = "";
+        document.getElementById('video-player-container').classList.add('hidden');
+      }
+
+      // PDF Link Setup
+      const pdfBtn = document.getElementById('viewer-pdf-btn');
+      if (course.pdfUrl) {
+        pdfBtn.href = course.pdfUrl;
+        document.getElementById('viewer-pdf-container').classList.remove('hidden');
+      } else {
+        document.getElementById('viewer-pdf-container').classList.add('hidden');
+      }
+
+      document.getElementById('full-course-viewer').classList.remove('hidden');
+    };
+
+    window.closeFullCourseView = function() {
+      const videoPlayer = document.getElementById('viewer-video-player');
+      videoPlayer.pause();
+      document.getElementById('full-course-viewer').classList.add('hidden');
+    };
+
+    window.setVideoSpeed = function(speed) {
+      const videoPlayer = document.getElementById('viewer-video-player');
+      videoPlayer.playbackRate = speed;
     };
 
     // 3. AUTH STATE LISTENER (SUPER ADMIN GUARD)
@@ -317,46 +434,33 @@
         let finalVideoUrl = "";
         let finalPdfUrl = "";
 
-        // Image Processing
         if (imageMode === 'file') {
           const file = document.getElementById('course-image-file').files[0];
-          if (file) {
-            finalImageUrl = await uploadFileToStorage(file, "courses/images");
-          }
+          if (file) finalImageUrl = await uploadFileToStorage(file, "courses/images");
         } else {
           finalImageUrl = document.getElementById('course-image-url').value;
         }
 
-        // Video Processing
         if (videoMode === 'file') {
           const file = document.getElementById('course-video-file').files[0];
-          if (file) {
-            finalVideoUrl = await uploadFileToStorage(file, "courses/videos");
-          }
+          if (file) finalVideoUrl = await uploadFileToStorage(file, "courses/videos");
         } else {
           finalVideoUrl = document.getElementById('course-video-url').value;
         }
 
-        // PDF Processing
         if (pdfMode === 'file') {
           const file = document.getElementById('course-pdf-file').files[0];
-          if (file) {
-            finalPdfUrl = await uploadFileToStorage(file, "courses/pdfs");
-          }
+          if (file) finalPdfUrl = await uploadFileToStorage(file, "courses/pdfs");
         } else {
           finalPdfUrl = document.getElementById('course-pdf-url').value;
         }
 
-        // Save metadata in Firestore
         await addDoc(collection(db, "courses"), {
           title: document.getElementById('course-title').value,
           description: document.getElementById('course-desc').value,
           imageUrl: finalImageUrl,
           videoUrl: finalVideoUrl,
           pdfUrl: finalPdfUrl,
-          imageSource: imageMode,
-          videoSource: videoMode,
-          pdfSource: pdfMode,
           createdAt: new Date()
         });
 
@@ -393,28 +497,36 @@
       }
     });
 
-    // 9. LIVE COURSES REALTIME LISTENER (Card Preview inside Admin Dashboard)
+    // 9. LIVE COURSES REALTIME LISTENER
     function loadCourses() {
       onSnapshot(collection(db, "courses"), (snapshot) => {
         const container = document.getElementById('course-list');
         container.innerHTML = "";
+        currentCoursesCache = {};
         
-        snapshot.forEach((doc) => {
-          const data = doc.data();
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const docId = docSnap.id;
+          currentCoursesCache[docId] = data;
+
           const defaultImg = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop";
           
           container.innerHTML += `
             <div class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col justify-between">
-              <div class="h-36 w-full bg-gray-100 overflow-hidden">
-                <img src="${data.imageUrl || defaultImg}" alt="${data.title}" class="w-full h-full object-cover" />
-              </div>
-              <div class="p-4">
-                <h4 class="font-extrabold text-base text-gray-900 mb-1">${data.title}</h4>
-                <p class="text-xs text-gray-600 line-clamp-2 mb-3">${data.description}</p>
-                <div class="flex space-x-2 text-xs">
-                  ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-indigo-600 font-semibold underline">Video (${data.videoSource || 'link'})</a>` : ''}
-                  ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-600 font-semibold underline">PDF (${data.pdfSource || 'link'})</a>` : ''}
+              <div>
+                <div class="h-36 w-full bg-gray-100 overflow-hidden">
+                  <img src="${data.imageUrl || defaultImg}" alt="${data.title}" class="w-full h-full object-cover" />
                 </div>
+                <div class="p-4">
+                  <h4 class="font-extrabold text-base text-gray-900 mb-1">${data.title}</h4>
+                  <p class="text-xs text-gray-600 line-clamp-3">${data.description}</p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <button onclick="openFullCourseView('${docId}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-3 rounded-md transition flex items-center justify-center">
+                  <span>View Course</span>
+                  <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
               </div>
             </div>
           `;
