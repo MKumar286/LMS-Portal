@@ -62,9 +62,33 @@
               <label class="block text-sm font-medium text-gray-700">Course Title</label>
               <input type="text" id="course-title" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., Aptitude Masterclass" />
             </div>
+
             <div>
-              <label class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea id="course-desc" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Course details..."></textarea>
+              <label class="block text-sm font-medium text-gray-700">Description / Highlights (Each line becomes a bullet point)</label>
+              <textarea id="course-desc" rows="4" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Complete placement preparation&#10;50+ Video Modules&#10;Downloadable PDF notes"></textarea>
+            </div>
+
+            <!-- THUMBNAIL IMAGE SOURCE OPTION -->
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+              <label class="block text-sm font-semibold text-gray-800">Course Thumbnail Image</label>
+              <div class="flex items-center space-x-6 text-sm">
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="image-source-type" value="file" checked onchange="toggleInputMode('image', 'file')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">Direct File Upload</span>
+                </label>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="image-source-type" value="url" onchange="toggleInputMode('image', 'url')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">External Image URL</span>
+                </label>
+              </div>
+
+              <!-- Image Inputs -->
+              <div id="image-file-container">
+                <input type="file" id="course-image-file" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
+              </div>
+              <div id="image-url-container" class="hidden">
+                <input type="url" id="course-image-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://images.unsplash.com/..." />
+              </div>
             </div>
 
             <!-- VIDEO SOURCE OPTION -->
@@ -124,7 +148,7 @@
 
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 class="text-xl font-semibold mb-4 text-gray-800">Published Courses</h3>
-          <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div id="course-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </section>
 
@@ -142,7 +166,7 @@
               <label class="block text-sm font-medium text-gray-700">College Full Name</label>
               <input type="text" id="college-name" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., JNTU Hyderabad" />
             </div>
-            <button type="submit" class="bg-emerald-600 text-white px-5 py-2 rounded-md hover:bg-emerald-700">Register College</button>
+            <button type="submit" class="bg-emerald-600 text-white px-5 py-2 rounded-md hover:bg-emerald-700 font-medium">Register College</button>
           </form>
         </div>
       </section>
@@ -175,8 +199,8 @@
       getDownloadURL 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    // 1. YOUR FIREBASE CONFIGURATION (Paste keys from Firebase Console)
-     const firebaseConfig = {
+    // 1. EMBEDDED FIREBASE CONFIGURATION
+    const firebaseConfig = {
       apiKey: "AIzaSyCga9Taij7xAz1UtfnVGaHiEGfYc9N4ROU",
       authDomain: "lms-portal-careergraspp.firebaseapp.com",
       projectId: "lms-portal-careergraspp",
@@ -184,7 +208,6 @@
       messagingSenderId: "175460420645",
       appId: "1:175460420645:web:9fe41933926ccb1b4543cc"
     };
-
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -273,7 +296,7 @@
       return await getDownloadURL(uploadTask.ref);
     }
 
-    // 7. COURSE FORM SUBMISSION (FILE OR URL DUAL MODE)
+    // 7. COURSE FORM SUBMISSION
     const courseForm = document.getElementById('add-course-form');
     courseForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -281,6 +304,7 @@
       const submitBtn = document.getElementById('submit-btn');
       const uploadStatus = document.getElementById('upload-status');
       
+      const imageMode = document.querySelector('input[name="image-source-type"]:checked').value;
       const videoMode = document.querySelector('input[name="video-source-type"]:checked').value;
       const pdfMode = document.querySelector('input[name="pdf-source-type"]:checked').value;
 
@@ -289,8 +313,19 @@
         submitBtn.classList.add('opacity-50');
         uploadStatus.classList.remove('hidden');
 
+        let finalImageUrl = "";
         let finalVideoUrl = "";
         let finalPdfUrl = "";
+
+        // Image Processing
+        if (imageMode === 'file') {
+          const file = document.getElementById('course-image-file').files[0];
+          if (file) {
+            finalImageUrl = await uploadFileToStorage(file, "courses/images");
+          }
+        } else {
+          finalImageUrl = document.getElementById('course-image-url').value;
+        }
 
         // Video Processing
         if (videoMode === 'file') {
@@ -316,8 +351,10 @@
         await addDoc(collection(db, "courses"), {
           title: document.getElementById('course-title').value,
           description: document.getElementById('course-desc').value,
+          imageUrl: finalImageUrl,
           videoUrl: finalVideoUrl,
           pdfUrl: finalPdfUrl,
+          imageSource: imageMode,
           videoSource: videoMode,
           pdfSource: pdfMode,
           createdAt: new Date()
@@ -325,6 +362,7 @@
 
         alert("Course published successfully!");
         courseForm.reset();
+        window.toggleInputMode('image', 'file');
         window.toggleInputMode('video', 'file');
         window.toggleInputMode('pdf', 'file');
 
@@ -355,20 +393,28 @@
       }
     });
 
-    // 9. LIVE COURSES REALTIME LISTENER
+    // 9. LIVE COURSES REALTIME LISTENER (Card Preview inside Admin Dashboard)
     function loadCourses() {
       onSnapshot(collection(db, "courses"), (snapshot) => {
         const container = document.getElementById('course-list');
         container.innerHTML = "";
+        
         snapshot.forEach((doc) => {
           const data = doc.data();
+          const defaultImg = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop";
+          
           container.innerHTML += `
-            <div class="border border-gray-200 p-4 rounded-lg bg-gray-50">
-              <h4 class="font-bold text-lg text-indigo-900">${data.title}</h4>
-              <p class="text-sm text-gray-600 mb-2">${data.description}</p>
-              <div class="flex space-x-2 text-xs">
-                ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-600 font-semibold underline">Watch Video (${data.videoSource || 'link'})</a>` : ''}
-                ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-600 font-semibold underline">View PDF (${data.pdfSource || 'link'})</a>` : ''}
+            <div class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col justify-between">
+              <div class="h-36 w-full bg-gray-100 overflow-hidden">
+                <img src="${data.imageUrl || defaultImg}" alt="${data.title}" class="w-full h-full object-cover" />
+              </div>
+              <div class="p-4">
+                <h4 class="font-extrabold text-base text-gray-900 mb-1">${data.title}</h4>
+                <p class="text-xs text-gray-600 line-clamp-2 mb-3">${data.description}</p>
+                <div class="flex space-x-2 text-xs">
+                  ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-indigo-600 font-semibold underline">Video (${data.videoSource || 'link'})</a>` : ''}
+                  ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-600 font-semibold underline">PDF (${data.pdfSource || 'link'})</a>` : ''}
+                </div>
               </div>
             </div>
           `;
