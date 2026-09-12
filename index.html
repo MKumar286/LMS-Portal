@@ -196,21 +196,20 @@
         Back to Admin Dashboard
       </button>
       <h2 id="page-course-header-title" class="text-lg font-bold text-white truncate max-w-md"></h2>
-      <span class="text-xs bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full font-semibold">Full Course Mode</span>
+      <span class="text-xs bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full font-semibold">Full HD Streaming</span>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Adaptive Video Box (Supports Drive, YouTube, & Direct Storage) -->
         <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-2xl space-y-4">
-          <div class="relative aspect-video rounded-xl overflow-hidden bg-black">
-            <video id="page-video-player" controls controlsList="nodownload" class="w-full h-full object-contain">
-              <source id="page-video-source" src="" type="video/mp4" />
-              Your browser does not support HTML5 video streaming.
-            </video>
+          <div id="video-player-box" class="relative aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center">
+            <!-- Dynamic Player Content Injected via renderVideoPlayer() -->
           </div>
 
           <div class="flex flex-wrap items-center justify-between gap-4 pt-2 text-sm border-t border-slate-800">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2" id="speed-controls-bar">
               <span class="text-slate-400 text-xs font-medium">Speed:</span>
               <button onclick="setVideoSpeed(0.75)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold text-slate-200">0.75x</button>
               <button onclick="setVideoSpeed(1.0)" class="px-2.5 py-1 bg-indigo-600 rounded text-xs font-semibold text-white">1.0x</button>
@@ -317,9 +316,9 @@
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-700">Video File / URL</label>
+              <label class="block text-xs font-medium text-gray-700">Video File / URL (Drive, YouTube, or MP4)</label>
               <input type="file" accept="video/*" class="module-video-file w-full mt-1 p-1.5 border border-gray-300 rounded bg-gray-50 text-xs" />
-              <input type="url" class="module-video-url w-full mt-1 p-1.5 border border-gray-300 rounded text-xs" placeholder="OR paste Video URL (https://...)" value="${initialData?.videoUrl || ''}" />
+              <input type="url" class="module-video-url w-full mt-1 p-1.5 border border-gray-300 rounded text-xs" placeholder="OR paste Google Drive / YouTube URL" value="${initialData?.videoUrl || ''}" />
             </div>
             <div>
               <label class="block text-xs font-medium text-gray-700">PDF File / URL</label>
@@ -332,7 +331,6 @@
       container.insertAdjacentHTML('beforeend', rowHtml);
     };
 
-    // Initialize first module row
     addModuleFormRow('create');
 
     // 3. UI EXPOSED NAVIGATION
@@ -355,7 +353,53 @@
       }
     };
 
-    // 4. FULL PAGE COURSE DISPLAY LOGIC
+    // 4. SMART VIDEO ENGINE (HANDLES GOOGLE DRIVE, YOUTUBE & DIRECT MP4)
+    function renderVideoPlayer(url) {
+      const box = document.getElementById('video-player-box');
+      const speedBar = document.getElementById('speed-controls-bar');
+      if (!url) {
+        box.innerHTML = `<div class="text-slate-500 text-sm">No video source provided for this part.</div>`;
+        return;
+      }
+
+      // Google Drive Handler
+      if (url.includes('drive.google.com')) {
+        speedBar.classList.add('hidden'); // Iframe hides speed bar
+        const driveIdMatch = url.match(/\/file\/d\/([^\/]+)/);
+        if (driveIdMatch && driveIdMatch[1]) {
+          const embedUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+          box.innerHTML = `<iframe src="${embedUrl}" class="w-full h-full rounded-xl border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+          return;
+        }
+      }
+
+      // YouTube Handler
+      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        speedBar.classList.add('hidden');
+        let ytId = "";
+        if (url.includes('v=')) {
+          ytId = url.split('v=')[1]?.split('&')[0];
+        } else if (url.includes('youtu.be/')) {
+          ytId = url.split('youtu.be/')[1]?.split('?')[0];
+        }
+        if (ytId) {
+          const embedUrl = `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`;
+          box.innerHTML = `<iframe src="${embedUrl}" class="w-full h-full rounded-xl border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+          return;
+        }
+      }
+
+      // Standard Direct MP4 / Firebase Storage Handler
+      speedBar.classList.remove('hidden');
+      box.innerHTML = `
+        <video id="page-video-player" controls controlsList="nodownload" class="w-full h-full object-contain rounded-xl">
+          <source src="${url}" type="video/mp4" />
+          Your browser does not support HTML5 video streaming.
+        </video>
+      `;
+    }
+
+    // 5. FULL PAGE COURSE DISPLAY LOGIC
     window.openFullPageCourseView = function(courseId) {
       const course = currentCoursesCache[courseId];
       if (!course) return;
@@ -408,13 +452,7 @@
       });
 
       document.getElementById('page-active-module-title').textContent = mod.title;
-
-      const videoPlayer = document.getElementById('page-video-player');
-      const videoSource = document.getElementById('page-video-source');
-      if (mod.videoUrl) {
-        videoSource.src = mod.videoUrl;
-        videoPlayer.load();
-      }
+      renderVideoPlayer(mod.videoUrl);
 
       const pdfBtn = document.getElementById('page-pdf-btn');
       if (mod.pdfUrl) {
@@ -426,18 +464,17 @@
     };
 
     window.closeFullPageCourseView = function() {
-      const videoPlayer = document.getElementById('page-video-player');
-      videoPlayer.pause();
+      document.getElementById('video-player-box').innerHTML = "";
       fullPageCourseView.classList.add('hidden');
       dashboardScreen.classList.remove('hidden');
     };
 
     window.setVideoSpeed = function(speed) {
       const videoPlayer = document.getElementById('page-video-player');
-      videoPlayer.playbackRate = speed;
+      if (videoPlayer) videoPlayer.playbackRate = speed;
     };
 
-    // 5. EDIT COURSE MODAL LOGIC
+    // 6. EDIT COURSE MODAL LOGIC
     window.openEditCourseModal = function(courseId) {
       const course = currentCoursesCache[courseId];
       if (!course) return;
@@ -465,7 +502,7 @@
       editCourseModal.classList.add('hidden');
     };
 
-    // 6. STORAGE UPLOAD WITH LIVE PROGRESS TRACKER
+    // 7. STORAGE UPLOAD WITH LIVE PROGRESS TRACKER
     function uploadFileWithProgress(file, folderPath, onProgress) {
       return new Promise((resolve, reject) => {
         if (!file) return resolve("");
@@ -487,7 +524,7 @@
       });
     }
 
-    // 7. PARSE MODULE ROWS FROM FORM
+    // 8. PARSE MODULE ROWS FROM FORM
     async function processFormModules(containerId, updateStatusFn) {
       const rows = document.getElementById(containerId).children;
       const modules = [];
@@ -529,7 +566,7 @@
       return modules;
     }
 
-    // 8. AUTH STATE LISTENER (SUPER ADMIN GUARD)
+    // 9. AUTH STATE LISTENER (SUPER ADMIN GUARD)
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -554,7 +591,7 @@
       }
     });
 
-    // 9. LOGIN & LOGOUT HANDLERS
+    // 10. LOGIN & LOGOUT HANDLERS
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       authError.classList.add('hidden');
@@ -577,7 +614,7 @@
       authError.classList.remove('hidden');
     }
 
-    // 10. CREATE COURSE SUBMISSION WITH TIMEOUT GUARD
+    // 11. CREATE COURSE SUBMISSION WITH TIMEOUT GUARD
     const courseForm = document.getElementById('add-course-form');
     courseForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -652,7 +689,7 @@
       }
     });
 
-    // 11. UPDATE / EDIT COURSE SUBMISSION
+    // 12. UPDATE / EDIT COURSE SUBMISSION
     const editCourseForm = document.getElementById('edit-course-form');
     editCourseForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -689,7 +726,7 @@
       }
     });
 
-    // 12. REGISTER COLLEGE HANDLER
+    // 13. REGISTER COLLEGE HANDLER
     const collegeForm = document.getElementById('add-college-form');
     collegeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -707,7 +744,7 @@
       }
     });
 
-    // 13. LIVE COURSES REALTIME LISTENER
+    // 14. LIVE COURSES REALTIME LISTENER
     function loadCourses() {
       onSnapshot(collection(db, "courses"), (snapshot) => {
         const container = document.getElementById('course-list');
