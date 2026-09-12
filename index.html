@@ -35,8 +35,8 @@
       <div>
         <h1 class="text-2xl font-bold mb-8 text-indigo-400">LMS SuperAdmin</h1>
         <nav class="space-y-2">
-          <button onclick="showSection('courses-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition">Manage Courses</button>
-          <button onclick="showSection('colleges-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition">Manage Colleges</button>
+          <button onclick="showSection('courses-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition font-medium">Manage Courses</button>
+          <button onclick="showSection('colleges-section')" class="w-full text-left py-2.5 px-4 rounded hover:bg-slate-800 transition font-medium">Manage Colleges</button>
         </nav>
       </div>
 
@@ -56,7 +56,8 @@
         
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 class="text-xl font-semibold mb-4 text-gray-800">Add New Course</h3>
-          <form id="add-course-form" class="space-y-4">
+          
+          <form id="add-course-form" class="space-y-6">
             <div>
               <label class="block text-sm font-medium text-gray-700">Course Title</label>
               <input type="text" id="course-title" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="e.g., Aptitude Masterclass" />
@@ -65,17 +66,59 @@
               <label class="block text-sm font-medium text-gray-700">Description</label>
               <textarea id="course-desc" required class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="Course details..."></textarea>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Video Lesson URL</label>
-                <input type="url" id="course-video" class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="https://..." />
+
+            <!-- VIDEO SOURCE OPTION -->
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+              <label class="block text-sm font-semibold text-gray-800">Video Lesson Source</label>
+              <div class="flex items-center space-x-6 text-sm">
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="video-source-type" value="file" checked onchange="toggleInputMode('video', 'file')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">Direct File Upload</span>
+                </label>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="video-source-type" value="url" onchange="toggleInputMode('video', 'url')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">External Link (YouTube / Drive)</span>
+                </label>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">PDF Material URL</label>
-                <input type="url" id="course-pdf" class="w-full mt-1 p-2 border border-gray-300 rounded-md" placeholder="https://..." />
+
+              <!-- Video Inputs -->
+              <div id="video-file-container">
+                <input type="file" id="course-video-file" accept="video/*" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
+              </div>
+              <div id="video-url-container" class="hidden">
+                <input type="url" id="course-video-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://www.youtube.com/watch?v=..." />
               </div>
             </div>
-            <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700">Publish Course</button>
+
+            <!-- PDF SOURCE OPTION -->
+            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+              <label class="block text-sm font-semibold text-gray-800">PDF Document Source</label>
+              <div class="flex items-center space-x-6 text-sm">
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="pdf-source-type" value="file" checked onchange="toggleInputMode('pdf', 'file')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">Direct File Upload</span>
+                </label>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input type="radio" name="pdf-source-type" value="url" onchange="toggleInputMode('pdf', 'url')" class="text-indigo-600 focus:ring-indigo-500" />
+                  <span class="ml-2 text-gray-700 font-medium">External Link (Google Drive / Cloud)</span>
+                </label>
+              </div>
+
+              <!-- PDF Inputs -->
+              <div id="pdf-file-container">
+                <input type="file" id="course-pdf-file" accept="application/pdf" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" />
+              </div>
+              <div id="pdf-url-container" class="hidden">
+                <input type="url" id="course-pdf-url" class="w-full p-2 border border-gray-300 rounded-md bg-white text-sm" placeholder="https://drive.google.com/file/d/..." />
+              </div>
+            </div>
+
+            <!-- Status Indicator -->
+            <div id="upload-status" class="hidden text-sm font-semibold text-indigo-600 animate-pulse">
+              Processing & uploading files... Please do not refresh.
+            </div>
+
+            <button type="submit" id="submit-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-md hover:bg-indigo-700 transition font-medium">Publish Course</button>
           </form>
         </div>
 
@@ -125,9 +168,15 @@
       getDoc,
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { 
+      getStorage, 
+      ref, 
+      uploadBytesResumable, 
+      getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    // 1. YOUR FIREBASE CONFIG
-    const firebaseConfig = {
+    // 1. YOUR FIREBASE CONFIGURATION (Paste keys from Firebase Console)
+     const firebaseConfig = {
       apiKey: "AIzaSyCga9Taij7xAz1UtfnVGaHiEGfYc9N4ROU",
       authDomain: "lms-portal-careergraspp.firebaseapp.com",
       projectId: "lms-portal-careergraspp",
@@ -136,31 +185,50 @@
       appId: "1:175460420645:web:9fe41933926ccb1b4543cc"
     };
 
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const loginScreen = document.getElementById('login-screen');
     const dashboardScreen = document.getElementById('dashboard-screen');
     const authError = document.getElementById('auth-error');
     const userEmailDisplay = document.getElementById('user-email-display');
 
-    // 2. AUTH STATE MONITORING (AUTH GUARD)
+    // 2. EXPOSE GLOBAL TOGGLE FUNCTIONS
+    window.showSection = function(sectionId) {
+      document.getElementById('courses-section').classList.add('hidden');
+      document.getElementById('colleges-section').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+    };
+
+    window.toggleInputMode = function(type, mode) {
+      const fileContainer = document.getElementById(`${type}-file-container`);
+      const urlContainer = document.getElementById(`${type}-url-container`);
+
+      if (mode === 'file') {
+        fileContainer.classList.remove('hidden');
+        urlContainer.classList.add('hidden');
+      } else {
+        fileContainer.classList.add('hidden');
+        urlContainer.classList.remove('hidden');
+      }
+    };
+
+    // 3. AUTH STATE LISTENER (SUPER ADMIN GUARD)
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Verify user role in Firestore before granting entry
         try {
           const userDocRef = doc(db, "users", user.uid);
           const userDoc = await getDoc(userDocRef);
 
           if (userDoc.exists() && userDoc.data().role === "super_admin") {
-            // Authorized
             loginScreen.classList.add('hidden');
             dashboardScreen.classList.remove('hidden');
             userEmailDisplay.textContent = user.email;
             loadCourses();
           } else {
-            // Not a Super Admin -> Force logout
             await signOut(auth);
             showError("Access Denied: You do not have Super Admin permissions.");
           }
@@ -168,13 +236,12 @@
           showError("Authorization check failed: " + err.message);
         }
       } else {
-        // Logged out state
         dashboardScreen.classList.add('hidden');
         loginScreen.classList.remove('hidden');
       }
     });
 
-    // 3. LOGIN FORM SUBMISSION
+    // 4. LOGIN HANDLER
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       authError.classList.add('hidden');
@@ -188,7 +255,7 @@
       }
     });
 
-    // 4. LOGOUT ACTION
+    // 5. LOGOUT HANDLER
     document.getElementById('logout-btn').addEventListener('click', () => {
       signOut(auth);
     });
@@ -198,32 +265,79 @@
       authError.classList.remove('hidden');
     }
 
-    // Navigation Toggle
-    window.showSection = function(sectionId) {
-      document.getElementById('courses-section').classList.add('hidden');
-      document.getElementById('colleges-section').classList.add('hidden');
-      document.getElementById(sectionId).classList.remove('hidden');
-    };
+    // 6. HELPER FUNCTION TO UPLOAD FILE TO STORAGE
+    async function uploadFileToStorage(file, folderPath) {
+      if (!file) return "";
+      const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
+      const uploadTask = await uploadBytesResumable(fileRef, file);
+      return await getDownloadURL(uploadTask.ref);
+    }
 
-    // 5. FIRESTORE ACTIONS (COURSES & COLLEGES)
+    // 7. COURSE FORM SUBMISSION (FILE OR URL DUAL MODE)
     const courseForm = document.getElementById('add-course-form');
     courseForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const uploadStatus = document.getElementById('upload-status');
+      
+      const videoMode = document.querySelector('input[name="video-source-type"]:checked').value;
+      const pdfMode = document.querySelector('input[name="pdf-source-type"]:checked').value;
+
       try {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50');
+        uploadStatus.classList.remove('hidden');
+
+        let finalVideoUrl = "";
+        let finalPdfUrl = "";
+
+        // Video Processing
+        if (videoMode === 'file') {
+          const file = document.getElementById('course-video-file').files[0];
+          if (file) {
+            finalVideoUrl = await uploadFileToStorage(file, "courses/videos");
+          }
+        } else {
+          finalVideoUrl = document.getElementById('course-video-url').value;
+        }
+
+        // PDF Processing
+        if (pdfMode === 'file') {
+          const file = document.getElementById('course-pdf-file').files[0];
+          if (file) {
+            finalPdfUrl = await uploadFileToStorage(file, "courses/pdfs");
+          }
+        } else {
+          finalPdfUrl = document.getElementById('course-pdf-url').value;
+        }
+
+        // Save metadata in Firestore
         await addDoc(collection(db, "courses"), {
           title: document.getElementById('course-title').value,
           description: document.getElementById('course-desc').value,
-          videoUrl: document.getElementById('course-video').value,
-          pdfUrl: document.getElementById('course-pdf').value,
+          videoUrl: finalVideoUrl,
+          pdfUrl: finalPdfUrl,
+          videoSource: videoMode,
+          pdfSource: pdfMode,
           createdAt: new Date()
         });
-        alert("Course published!");
+
+        alert("Course published successfully!");
         courseForm.reset();
+        window.toggleInputMode('video', 'file');
+        window.toggleInputMode('pdf', 'file');
+
       } catch (error) {
         alert("Error publishing course: " + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50');
+        uploadStatus.classList.add('hidden');
       }
     });
 
+    // 8. REGISTER COLLEGE HANDLER
     const collegeForm = document.getElementById('add-college-form');
     collegeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -234,13 +348,14 @@
           name: collegeName,
           createdAt: new Date()
         });
-        alert("College registered!");
+        alert("College registered successfully!");
         collegeForm.reset();
       } catch (error) {
         alert("Error registering college: " + error.message);
       }
     });
 
+    // 9. LIVE COURSES REALTIME LISTENER
     function loadCourses() {
       onSnapshot(collection(db, "courses"), (snapshot) => {
         const container = document.getElementById('course-list');
@@ -252,8 +367,8 @@
               <h4 class="font-bold text-lg text-indigo-900">${data.title}</h4>
               <p class="text-sm text-gray-600 mb-2">${data.description}</p>
               <div class="flex space-x-2 text-xs">
-                ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-500 underline">Watch Video</a>` : ''}
-                ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-500 underline">View PDF</a>` : ''}
+                ${data.videoUrl ? `<a href="${data.videoUrl}" target="_blank" class="text-blue-600 font-semibold underline">Watch Video (${data.videoSource || 'link'})</a>` : ''}
+                ${data.pdfUrl ? `<a href="${data.pdfUrl}" target="_blank" class="text-red-600 font-semibold underline">View PDF (${data.pdfSource || 'link'})</a>` : ''}
               </div>
             </div>
           `;
