@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard & Learning Portal - Careergraspp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- FIREBASE SDKs (v9 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
+
+  <!-- ================= TOP NAVIGATION BAR (FULL WIDTH) ================= -->
+  <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm w-full">
+    <div class="w-full px-4 md:px-10 lg:px-12 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-md">C</div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Career<span class="text-indigo-600">graspp</span></span>
+          <span class="block text-[10px] text-slate-500 font-semibold tracking-widest uppercase -mt-1">Learning Portal</span>
+        </div>
+      </a>
+
+      <div class="flex items-center space-x-4">
+        <a href="index.html#courses-section" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+          Browse All Courses
+        </a>
+        <button onclick="logoutStudent()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition border border-red-200">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PROFILE BANNER (FULL WIDTH) ================= -->
+  <section class="w-full px-4 md:px-10 lg:px-12 mt-8">
+    <div class="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-800 relative overflow-hidden">
+      
+      <div class="flex items-center space-x-5 z-10">
+        <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 border-2 border-indigo-400 flex items-center justify-center text-3xl font-black text-white shadow-xl">
+          <span id="profile-avatar-initial">S</span>
+        </div>
+        <div>
+          <div class="flex items-center space-x-3">
+            <h1 id="profile-student-name" class="text-2xl md:text-3xl font-black tracking-tight text-white">Loading Profile...</h1>
+            <span id="profile-role-badge" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Cloud Connected</span>
+          </div>
+          <p id="profile-student-email" class="text-xs md:text-sm text-slate-300 mt-1">Fetching from Firebase...</p>
+          <p id="profile-student-phone" class="text-xs text-indigo-300 font-semibold mt-0.5"></p>
+          <p class="text-[11px] text-slate-400 mt-1">Member since: <span id="profile-joined-date">---</span></p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-6 bg-white/10 backdrop-blur-md border border-white/15 px-6 py-4 rounded-2xl z-10 w-full md:w-auto justify-around">
+        <div class="text-center">
+          <span id="profile-enrolled-count" class="text-3xl font-black text-amber-400 block">0</span>
+          <span class="text-[11px] text-slate-300 font-medium uppercase tracking-wider">My Paid Courses</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= DASHBOARD COURSES GRID (FULL WIDTH) ================= -->
+  <main class="w-full px-4 md:px-10 lg:px-12 py-10 flex-1">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 border-b border-slate-200 pb-5">
+      <div>
+        <h2 class="text-2xl font-extrabold text-slate-900">Enrolled Learning Modules</h2>
+        <p class="text-xs text-slate-500">Access your 4 course modules, 4 video & PDF parts, and track your completed lessons with green checkmarks.</p>
+      </div>
+    </div>
+
+    <div id="student-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <!-- Injected dynamically via JS -->
+    </div>
+  </main>
+
+  <!-- ================= UNIFIED LOGIN MODAL (FALLBACK LOGIN) ================= -->
+  <div id="unified-login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 md:p-8 space-y-6">
+      
+      <div class="pb-2 border-b border-slate-100">
+        <h3 class="font-extrabold text-xl text-slate-900">Careergraspp Login</h3>
+        <p class="text-xs text-slate-500">Select your role to access your account</p>
+      </div>
+
+      <!-- ROLE TAB SWITCHER -->
+      <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1.5 rounded-xl text-xs font-bold text-center">
+        <button id="tab-btn-student" onclick="switchLoginRoleTab('student')" class="py-2.5 rounded-lg bg-white text-indigo-600 shadow-sm transition">🎓 Student</button>
+        <button id="tab-btn-org" onclick="switchLoginRoleTab('org')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🏢 Org</button>
+        <button id="tab-btn-admin" onclick="switchLoginRoleTab('admin')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">⚙️ Admin</button>
+      </div>
+
+      <!-- STUDENT FORM -->
+      <form id="form-role-student" onsubmit="executeStudentAuth(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Registered Email Address</label>
+          <input type="email" id="login-student-email" required placeholder="student@example.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Registered Mobile Number</label>
+          <input type="tel" id="login-student-phone" required placeholder="+91 9876543210" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition">
+          Sign In as Student →
+        </button>
+      </form>
+
+      <!-- ORGANIZATION FORM -->
+      <form id="form-role-org" onsubmit="executeOrgAuth(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Organization Email / ID</label>
+          <input type="text" id="login-org-email" required placeholder="org@college.edu.in" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Institutional Passcode</label>
+          <input type="password" id="login-org-code" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-600/25 transition">
+          Sign In as Organization →
+        </button>
+      </form>
+
+      <!-- ADMIN FORM -->
+      <form id="form-role-admin" onsubmit="executeAdminAuth(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Administrator Email</label>
+          <input type="email" id="login-admin-email" required placeholder="admin@careergraspp.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Master Access Key</label>
+          <input type="password" id="login-admin-key" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-amber-600/25 transition">
+          Sign In as Admin →
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= INLINE VIDEO PLAYER MODAL ================= -->
+  <div id="video-player-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col p-4 md:p-6 space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+        <h4 id="video-modal-title" class="font-extrabold text-sm md:text-base text-slate-900 truncate max-w-lg"></h4>
+        <button onclick="closeVideoPlayerModal()" class="text-slate-400 hover:text-slate-800 font-bold text-2xl px-2">&times;</button>
+      </div>
+      <div id="video-container-box" class="relative w-full aspect-video min-h-[380px] md:min-h-[460px] bg-black rounded-xl overflow-hidden flex items-center justify-center shadow-inner border border-slate-200"></div>
+      
+      <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 pt-2 gap-3 border-t border-slate-200">
+        <button id="mark-complete-btn" onclick="toggleLessonCompletion()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition flex items-center justify-center shadow-sm">
+          ✓ Mark as Completed
+        </button>
+        <a id="video-pdf-link" href="#" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition flex items-center justify-center">
+          📄 View Session PDF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-100 border-t border-slate-200 py-8 px-6 text-center text-xs text-slate-600 w-full">
+    © 2026 Careergraspp LMS. Cloud-Powered Learning.
+  </footer>
+
+  <!-- ================= JAVASCRIPT & FIREBASE LOGIC ================= -->
+  <script>
+    /* FIREBASE CONFIGURATION */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBh9VQBgh3dSRug89_2NaVEOD7GPhHKvyE",
+      authDomain: "careergrasppfinal.firebaseapp.com",
+      projectId: "careergrasppfinal",
+      storageBucket: "careergrasppfinal.firebasestorage.app",
+      messagingSenderId: "243374148181",
+      appId: "1:243374148181:web:7f6a37b9ac71caf76022dc"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let activeStudentProfile = null;
+    let currentPlayingLessonKey = null;
+
+    const samplePdfLinks = [
+      "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      "https://www.orimi.com/pdf-test.pdf"
+    ];
+
+    const videoUrls = [
+      "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing",
+      "https://drive.google.com/file/d/1uXC7EsUOUNzE3Mal6Z7pFpiqbTspbMZu/view?usp=sharing",
+      "https://drive.google.com/file/d/1XUjqs8ZXdS7czBPHvmRwckQ-_0aZctbw/view?usp=sharing",
+      "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing"
+    ];
+
+    const courseTitlesList = [
+      "Corporate Communication & Etiquette", "GD & Personal Interview Mastery", "Quantitative Aptitude & Logic",
+      "Resume Building & LinkedIn Branding", "Emotional Intelligence & Workplace Empathy", "Time Management & Productivity Hacks",
+      "Public Speaking & Stage Confidence", "Critical Thinking & Problem Solving", "Leadership & Team Dynamics",
+      "Negotiation & Conflict Resolution", "Workplace Adaptability & Growth Mindset", "Business Email & Report Writing",
+      "Professional Ethics & Workplace Integrity", "Stress Management & Work-Life Balance", "Decision Making Under Pressure",
+      "Networking & Relationship Building", "Creative Thinking & Innovation", "Interpersonal Skills & Active Listening"
+    ];
+
+    const pricesList = [250, 499, 399, 299, 349, 299, 449, 399, 499, 349, 299, 249, 199, 299, 399, 349, 299, 249];
+    const imgsList = [
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop"
+    ];
+
+    const softSkillsCourses = courseTitlesList.map((title, idx) => {
+      const id = idx + 1;
+      return {
+        id: id,
+        title: title,
+        price: pricesList[idx],
+        image: imgsList[idx],
+        modulesOverview: [
+          {
+            title: `MODULE 1: FOUNDATIONS OF ${title.toUpperCase()}`,
+            points: [
+              `Understanding the core principles and psychological fundamentals of ${title}.`,
+              "Overcoming mental hesitation and building foundational confidence.",
+              "Identifying common pitfalls faced by entry-level candidates."
+            ]
+          },
+          {
+            title: `MODULE 2: STRATEGIC EXECUTION & DRILLS`,
+            points: [
+              `Step-by-step framework to master ${title} in fast-paced environments.`,
+              "Active listening, clear articulation, and situational adaptation.",
+              "Interactive drills for campus placement interviews."
+            ]
+          },
+          {
+            title: `MODULE 3: REAL-WORLD CASE STUDIES & SCENARIOS`,
+            points: [
+              "Detailed breakdown of actual MNC and campus recruitment scenarios.",
+              "Handling high-pressure situations, difficult managers, and tricky questions."
+            ]
+          },
+          {
+            title: `MODULE 4: MASTERY & CERTIFICATION`,
+            points: [
+              "Synthesizing all tools for long-term career growth.",
+              "Final comprehensive assessment and verified certificate unlocks."
+            ]
+          }
+        ],
+        partsList: [
+          {
+            partTitle: `Part 1: Fundamentals of ${title}`,
+            lessons: [
+              { key: `${id}_1_1`, title: "Lesson 1.1: Core Concepts & Principles", duration: "10 mins", videoUrl: videoUrls[0], pdfUrl: samplePdfLinks[0] }
+            ]
+          },
+          {
+            partTitle: `Part 2: Strategic Execution Frameworks`,
+            lessons: [
+              { key: `${id}_2_1`, title: "Lesson 2.1: Practical Drills & Articulation", duration: "12 mins", videoUrl: videoUrls[1], pdfUrl: samplePdfLinks[1] }
+            ]
+          },
+          {
+            partTitle: `Part 3: Corporate Case Studies`,
+            lessons: [
+              { key: `${id}_3_1`, title: "Lesson 3.1: Handling High-Pressure Situations", duration: "14 mins", videoUrl: videoUrls[2], pdfUrl: samplePdfLinks[0] }
+            ]
+          },
+          {
+            partTitle: `Part 4: Final Masterclass`,
+            lessons: [
+              { key: `${id}_4_1`, title: "Lesson 4.1: Placement Assessment & Certification", duration: "15 mins", videoUrl: videoUrls[3], pdfUrl: samplePdfLinks[1] }
+            ]
+          }
+        ],
+        keyTakeaways: [
+          `Master the fundamental pillars of ${title} for campus placement success.`,
+          "Learn step-by-step techniques to eliminate hesitation and speak with authority.",
+          "Understand how hiring managers evaluate non-verbal cues and body language.",
+          "Gain practical frameworks to analyze complex workplace scenarios rapidly.",
+          "Structure professional responses using proven industry frameworks like STAR.",
+          "Develop strong interpersonal adaptability across cross-functional teams.",
+          "Learn to manage high-pressure situations and turn conflicts into solutions.",
+          "Build executive presence suitable for corporate client interactions.",
+          "Utilize downloadable session PDF guides to practice offline before interviews.",
+          "Receive a verified completion certificate to highlight on your resume and LinkedIn."
+        ]
+      };
+    });
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let email = urlParams.get('email') || localStorage.getItem('careergraspp_active_email');
+      let phone = urlParams.get('phone') || localStorage.getItem('careergraspp_active_phone');
+      let role = localStorage.getItem('careergraspp_role') || 'student';
+      const unlockedId = parseInt(urlParams.get('unlocked'));
+
+      if (role === 'admin' || role === 'org') {
+        loadAdminOrOrgUI(role, email);
+      } else if (email && phone) {
+        await verifyAndFetchStudent(email, phone, unlockedId);
+      } else {
+        document.getElementById('unified-login-modal').classList.remove('hidden');
+      }
+    });
+
+    /* CREDENTIAL VERIFICATION FROM FIRESTORE */
+    async function verifyAndFetchStudent(email, phone, unlockedId) {
+      try {
+        const docRef = db.collection('students').doc(email.toLowerCase());
+
+        if (unlockedId) {
+          await docRef.set({
+            enrolledCourses: firebase.firestore.FieldValue.arrayUnion(unlockedId)
+          }, { merge: true });
+        }
+
+        const doc = await docRef.get();
+        if (doc.exists) {
+          const profile = doc.data();
+          const dbPhone = (profile.phone || "").replace(/[^0-9]/g, '');
+          const inputPhone = phone.replace(/[^0-9]/g, '');
+
+          if (dbPhone && inputPhone && !dbPhone.includes(inputPhone) && !inputPhone.includes(dbPhone)) {
+            alert("⚠️ Mobile number mismatch. Please enter the phone number used during enrollment.");
+            document.getElementById('unified-login-modal').classList.remove('hidden');
+            return;
+          }
+
+          localStorage.setItem('careergraspp_active_email', email);
+          localStorage.setItem('careergraspp_active_phone', phone);
+          localStorage.setItem('careergraspp_role', 'student');
+          activeStudentProfile = profile;
+
+          document.getElementById('unified-login-modal').classList.add('hidden');
+          loadDashboardUI(profile);
+        } else {
+          alert(`No registered student account found for ${email}. Please enroll in a course first.`);
+          document.getElementById('unified-login-modal').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error("Firebase Verification Error:", err);
+        alert("Database connection error: " + err.message);
+      }
+    }
+
+    function loadAdminOrOrgUI(role, email) {
+      const allCourseIds = softSkillsCourses.map(c => c.id);
+      activeStudentProfile = {
+        name: role === 'admin' ? "System Administrator" : "Institutional Partner",
+        email: email || `${role}@careergraspp.com`,
+        phone: "Authorized Portal Access",
+        enrolledCourses: allCourseIds,
+        completedLessons: [],
+        joinedDate: "Active Session"
+      };
+
+      document.getElementById('profile-role-badge').textContent = role.toUpperCase() + " ACTIVE";
+      document.getElementById('profile-role-badge').className = "bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider";
+      document.getElementById('unified-login-modal').classList.add('hidden');
+      loadDashboardUI(activeStudentProfile);
+    }
+
+    function loadDashboardUI(profile) {
+      document.getElementById('profile-student-name').textContent = profile.name || "Student Profile";
+      document.getElementById('profile-student-email').textContent = profile.email || "";
+      document.getElementById('profile-student-phone').textContent = profile.phone || "";
+      document.getElementById('profile-avatar-initial').textContent = (profile.name || "S").charAt(0).toUpperCase();
+      document.getElementById('profile-enrolled-count').textContent = profile.enrolledCourses ? profile.enrolledCourses.length : 0;
+      document.getElementById('profile-joined-date').textContent = profile.joinedDate || "Recent";
+
+      renderDashboardGrid(profile);
+    }
+
+    /* RENDER DASHBOARD WITH GREEN CHECKMARKS */
+    function renderDashboardGrid(profile) {
+      const container = document.getElementById('student-courses-grid');
+      container.innerHTML = "";
+
+      const enrolledList = profile.enrolledCourses || [];
+      const completedSet = new Set(profile.completedLessons || []);
+      const paidCourses = softSkillsCourses.filter(course => enrolledList.includes(course.id));
+
+      if (paidCourses.length === 0) {
+        renderEmptyState("You haven't enrolled in any courses yet.");
+        return;
+      }
+
+      paidCourses.forEach(course => {
+        let modulesHtml = (course.modulesOverview || []).map(mod => `
+          <div class="bg-indigo-50/70 border-l-4 border-indigo-600 p-3 rounded-r-xl space-y-1 my-2">
+            <p class="font-extrabold text-[11px] text-slate-900 uppercase tracking-wide">${mod.title}</p>
+            <ul class="space-y-1 pl-1">
+              ${mod.points.map(pt => `<li class="text-[11px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1.5">•</span><span>${pt}</span></li>`).join('')}
+            </ul>
+          </div>
+        `).join('');
+
+        let partsHtml = (course.partsList || []).map((part) => `
+          <div class="space-y-2 mt-3">
+            <p class="font-extrabold text-xs text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${part.partTitle}</p>
+            <div class="space-y-1.5">
+              ${part.lessons.map(les => {
+                const isCompleted = completedSet.has(les.key);
+                return `
+                  <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center space-x-2 truncate">
+                      ${isCompleted 
+                        ? `<span class="bg-emerald-100 text-emerald-700 border border-emerald-300 font-extrabold text-[10px] px-2 py-0.5 rounded-md flex-shrink-0">✓ Completed</span>` 
+                        : `<span class="bg-slate-200 text-slate-600 font-bold text-[10px] px-2 py-0.5 rounded-md flex-shrink-0">Pending</span>`
+                      }
+                      <span class="font-medium text-slate-800 truncate">${les.title}</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5 flex-shrink-0">
+                      <button onclick="playLessonVideo('${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition text-[11px] shadow-sm">▶ Play</button>
+                      <a href="${les.pdfUrl}" target="_blank" class="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-[11px]">📄 PDF</a>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('');
+
+        let takeawaysHtml = (course.keyTakeaways || []).map((pt, kIdx) => `
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start space-x-2 text-xs">
+            <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
+            <span class="text-slate-700 font-medium">${pt}</span>
+          </div>
+        `).join('');
+
+        container.innerHTML += `
+          <div class="bg-white border border-emerald-400 ring-2 ring-emerald-500/10 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition">
+            <div>
+              <div class="h-44 w-full bg-slate-100 relative">
+                <img src="${course.image}" alt="${course.title}" class="w-full h-full object-cover" />
+                <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] px-2.5 py-1 rounded-full font-extrabold shadow">✓ UNLOCKED</span>
+              </div>
+              
+              <div class="p-5 space-y-5">
+                <h3 class="text-lg font-bold text-slate-900 line-clamp-1">${course.title}</h3>
+                
+                <div>
+                  <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Course Syllabus (4 Modules)</p>
+                  ${modulesHtml}
+                </div>
+
+                <div>
+                  <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Unlocked Video & PDF Parts</p>
+                  ${partsHtml}
+                </div>
+
+                <div>
+                  <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">10 Key Learning Outcomes</p>
+                  <div class="space-y-2">${takeawaysHtml}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 pt-0 mt-4">
+              <div class="w-full py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-xs rounded-xl text-center">Full Access Active</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderEmptyState(message) {
+      const container = document.getElementById('student-courses-grid');
+      container.innerHTML = `
+        <div class="col-span-full text-center py-16 bg-white border border-slate-200 rounded-3xl p-8 space-y-4 shadow-sm">
+          <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📚</div>
+          <h3 class="text-xl font-bold text-slate-900">No Enrolled Courses Found</h3>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto">${message}</p>
+          <a href="index.html#courses-section" class="inline-block px-6 py-3 bg-indigo-600 text-white font-bold text-xs rounded-xl transition">Browse All Courses →</a>
+        </div>
+      `;
+    }
+
+    /* MULTI-ROLE FALLBACK LOGIN FUNCTIONALITY */
+    function switchLoginRoleTab(role) {
+      const studentTab = document.getElementById('tab-btn-student');
+      const orgTab = document.getElementById('tab-btn-org');
+      const adminTab = document.getElementById('tab-btn-admin');
+
+      const studentForm = document.getElementById('form-role-student');
+      const orgForm = document.getElementById('form-role-org');
+      const adminForm = document.getElementById('form-role-admin');
+
+      [studentForm, orgForm, adminForm].forEach(f => f.classList.add('hidden'));
+      [studentTab, orgTab, adminTab].forEach(t => {
+        t.className = "py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+      });
+
+      if (role === 'student') {
+        studentForm.classList.remove('hidden');
+        studentTab.className = "py-2.5 rounded-lg bg-white text-indigo-600 shadow-sm font-bold transition";
+      } else if (role === 'org') {
+        orgForm.classList.remove('hidden');
+        orgTab.className = "py-2.5 rounded-lg bg-white text-emerald-600 shadow-sm font-bold transition";
+      } else if (role === 'admin') {
+        adminForm.classList.remove('hidden');
+        adminTab.className = "py-2.5 rounded-lg bg-white text-amber-600 shadow-sm font-bold transition";
+      }
+    }
+
+    async function executeStudentAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-student-email').value.trim().toLowerCase();
+      const phone = document.getElementById('login-student-phone').value.trim();
+
+      if (!email || !phone) return alert("Please enter both Email and Phone number.");
+
+      await verifyAndFetchStudent(email, phone, null);
+    }
+
+    function executeOrgAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-org-email').value.trim();
+      localStorage.setItem('careergraspp_active_email', email);
+      localStorage.setItem('careergraspp_role', 'org');
+      loadAdminOrOrgUI('org', email);
+    }
+
+    function executeAdminAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-admin-email').value.trim();
+      localStorage.setItem('careergraspp_active_email', email);
+      localStorage.setItem('careergraspp_role', 'admin');
+      loadAdminOrOrgUI('admin', email);
+    }
+
+    function playLessonVideo(key, title, rawVideoUrl, rawPdfUrl) {
+      currentPlayingLessonKey = key;
+      document.getElementById('video-modal-title').textContent = title;
+      const containerBox = document.getElementById('video-container-box');
+      
+      let driveFileId = "";
+      if (rawVideoUrl.includes('drive.google.com')) {
+        const driveIdMatch = rawVideoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (driveIdMatch && driveIdMatch[1]) driveFileId = driveIdMatch[1];
+      }
+
+      if (driveFileId) {
+        const embedUrl = `https://drive.google.com/file/d/${driveFileId}/preview`;
+        containerBox.innerHTML = `
+          <div class="relative w-full h-full">
+            <iframe src="${embedUrl}" class="w-full h-full min-h-[380px] md:min-h-[450px] rounded-xl border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            <div class="absolute top-0 right-0 w-14 h-14 bg-black z-10"></div>
+          </div>`;
+      } else {
+        containerBox.innerHTML = `<video class="w-full h-full object-contain rounded-xl" controls autoplay><source src="${rawVideoUrl}" type="video/mp4" /></video>`;
+      }
+
+      document.getElementById('video-pdf-link').href = rawPdfUrl;
+      toggleLessonCompletion(key);
+      document.getElementById('video-player-modal').classList.remove('hidden');
+    }
+
+    async function toggleLessonCompletion(keyOverride) {
+      const key = keyOverride || currentPlayingLessonKey;
+      if (!key || !activeStudentProfile || !activeStudentProfile.email) return;
+
+      const userDocRef = db.collection('students').doc(activeStudentProfile.email);
+      try {
+        await userDocRef.update({
+          completedLessons: firebase.firestore.FieldValue.arrayUnion(key)
+        });
+
+        if (!activeStudentProfile.completedLessons) activeStudentProfile.completedLessons = [];
+        if (!activeStudentProfile.completedLessons.includes(key)) {
+          activeStudentProfile.completedLessons.push(key);
+        }
+
+        renderDashboardGrid(activeStudentProfile);
+      } catch (err) {
+        console.error("Error persisting lesson completion:", err);
+      }
+    }
+
+    function closeVideoPlayerModal() {
+      document.getElementById('video-container-box').innerHTML = "";
+      document.getElementById('video-player-modal').classList.add('hidden');
+    }
+
+    function logoutStudent() {
+      if (confirm("Are you sure you want to log out?")) {
+        localStorage.removeItem('careergraspp_active_email');
+        localStorage.removeItem('careergraspp_active_phone');
+        localStorage.removeItem('careergraspp_role');
+        window.location.href = "index.html";
+      }
+    }
+  </script>
+</body>
+</html>

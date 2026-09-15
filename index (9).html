@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Careergraspp - Soft Skills & Placement Training</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- RAZORPAY CHECKOUT SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- FIREBASE SDKs (v9 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-white text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
+
+  <!-- ================= NAVIGATION BAR (FULL SCREEN WIDTH) ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm w-full">
+    <div class="w-full px-4 md:px-10 lg:px-12 py-4 flex items-center justify-between">
+      
+      <a href="index.html" class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-md shadow-indigo-500/20">
+          C
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Career<span class="text-indigo-600">graspp</span></span>
+          <span class="block text-[10px] text-slate-500 font-semibold tracking-widest uppercase -mt-1">Soft Skills Academy</span>
+        </div>
+      </a>
+
+      <div class="flex items-center space-x-4">
+        <a href="#courses-section" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition flex items-center shadow-sm">
+          Courses
+        </a>
+
+        <!-- MULTI-ROLE LOGIN DROPDOWN -->
+        <div class="relative inline-block text-left">
+          <button id="login-dropdown-btn" onclick="toggleLoginDropdown()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center">
+            <span>Login Options</span>
+            <svg class="w-4 h-4 ml-2 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="login-dropdown-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white border border-slate-200 shadow-2xl z-50 overflow-hidden py-1 divide-y divide-slate-100">
+            <!-- 1. Student Login -->
+            <button onclick="openUnifiedLoginModal('student')" class="w-full text-left flex items-center px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+              <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 font-bold text-sm">🎓</div>
+              <div>
+                <span class="block text-slate-900 font-bold">Student Login</span>
+                <span class="text-[10px] text-slate-500 font-normal">Enrolled student dashboard</span>
+              </div>
+            </button>
+            <!-- 2. Organization Login -->
+            <button onclick="openUnifiedLoginModal('org')" class="w-full text-left flex items-center px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 font-bold text-sm">🏢</div>
+              <div>
+                <span class="block text-slate-900 font-bold">Organization Login</span>
+                <span class="text-[10px] text-slate-500 font-normal">Institutional & Corporate Portal</span>
+              </div>
+            </button>
+            <!-- 3. Admin Login -->
+            <button onclick="openUnifiedLoginModal('admin')" class="w-full text-left flex items-center px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mr-3 font-bold text-sm">⚙️</div>
+              <div>
+                <span class="block text-slate-900 font-bold">Admin Login</span>
+                <span class="text-[10px] text-slate-500 font-normal">System & Content Control</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO BANNER (FULL WIDTH) ================= -->
+  <section class="w-full bg-white flex items-center justify-center my-4 px-4 md:px-10 lg:px-12">
+    <div class="w-full mx-auto flex items-center justify-center">
+      <img 
+        src="careergraspplogo.jpg" 
+        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop';" 
+        alt="Careergraspp Main Banner" 
+        class="w-full h-auto max-h-[75vh] object-contain rounded-2xl shadow-sm border border-slate-100" 
+      />
+    </div>
+  </section>
+
+  <!-- ================= COURSES LIST SECTION (FULL WIDTH) ================= -->
+  <section id="courses-section" class="py-16 bg-slate-50 border-t border-slate-200 w-full">
+    <div class="w-full px-4 md:px-10 lg:px-12">
+      <div class="text-center mb-16 space-y-3">
+        <h2 class="text-3xl font-extrabold text-slate-900">Featured Soft Skills Programs</h2>
+        <p class="text-sm text-slate-600 max-w-2xl mx-auto">Master essential corporate skills with our 18 specialized programs. Click "View Course" to inspect syllabus & enrollment details.</p>
+      </div>
+
+      <div id="courses-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FULL SCREEN COURSE DETAIL MODAL ================= -->
+  <div id="course-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm overflow-y-auto p-2 md:p-6">
+    <div class="w-full bg-slate-50 rounded-3xl shadow-2xl overflow-hidden min-h-[90vh] flex flex-col border border-slate-200">
+      
+      <div class="bg-white text-slate-900 p-6 flex justify-between items-center border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <button onclick="closeCourseModal()" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-semibold text-sm transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          Back to Courses List
+        </button>
+        <div class="flex items-center space-x-3">
+          <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold">Special Offer</span>
+          <button onclick="closeCourseModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">&times;</button>
+        </div>
+      </div>
+
+      <div class="p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-10 flex-1">
+        
+        <div class="lg:col-span-2 space-y-8">
+          <div class="space-y-4">
+            <div class="h-64 w-full rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+              <img id="modal-course-img" src="" alt="Course Cover" class="w-full h-full object-cover" />
+            </div>
+            <h1 id="modal-course-title" class="text-3xl md:text-4xl font-extrabold text-slate-900"></h1>
+          </div>
+
+          <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl space-y-4 shadow-sm">
+            <h3 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center">
+              <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Complete Course Syllabus & 4 Module Breakdown
+            </h3>
+            <div id="modal-course-desc" class="space-y-6 text-sm text-slate-700"></div>
+          </div>
+
+          <div class="space-y-4 pt-4 border-t border-slate-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-bold text-slate-900 flex items-center">
+                <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Course Video Parts & Sub-Lessons (4 Modules)
+              </h3>
+              <span class="text-xs text-indigo-600 font-semibold">Click any Part to expand lessons</span>
+            </div>
+            <div id="modal-parts-accordion-list" class="space-y-4"></div>
+          </div>
+
+          <div class="bg-slate-100 border border-slate-200 p-6 md:p-8 rounded-2xl space-y-4 shadow-sm">
+            <h3 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center">
+              <svg class="w-5 h-5 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              10 Key Learning Outcomes You Will Gain From This Course
+            </h3>
+            <div id="modal-course-takeaways" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm text-slate-700"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT PRICING CARD -->
+        <div class="space-y-6">
+          <div class="bg-white text-slate-900 rounded-3xl p-8 border border-slate-200 shadow-xl sticky top-28 space-y-6">
+            
+            <div class="space-y-2 border-b border-slate-200 pb-6">
+              <span class="text-xs bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Instant Access</span>
+              <div class="flex items-baseline space-x-2 pt-2">
+                <span id="modal-course-price" class="text-4xl font-black text-slate-900">₹250</span>
+                <span id="modal-course-original-price" class="text-slate-400 text-sm line-through">₹2,999</span>
+                <span class="text-xs text-emerald-600 font-bold">Limited Offer</span>
+              </div>
+              <p class="text-xs text-slate-500">One-time payment. Lifetime unlimited access to all video parts & PDF notes.</p>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>4 High HD Video Modules Per Course</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Google Drive Stream & PDF Support</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Progress Tracking & Completion Marks</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Verified Certificate of Completion</span>
+              </div>
+            </div>
+
+            <div class="pt-4 space-y-3">
+              <button id="modal-enroll-btn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-2xl text-center block shadow-lg shadow-indigo-600/30 transition text-sm">
+                Pay & Enroll Now
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= UNIFIED MULTI-ROLE LOGIN MODAL ================= -->
+  <div id="unified-login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 md:p-8 space-y-6">
+      
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <div>
+          <h3 class="font-extrabold text-xl text-slate-900">Careergraspp Login</h3>
+          <p class="text-xs text-slate-500">Select your role to access your account</p>
+        </div>
+        <button onclick="closeUnifiedLoginModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">&times;</button>
+      </div>
+
+      <!-- ROLE TAB SWITCHER -->
+      <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1.5 rounded-xl text-xs font-bold text-center">
+        <button id="tab-btn-student" onclick="switchLoginRoleTab('student')" class="py-2.5 rounded-lg bg-white text-indigo-600 shadow-sm transition">🎓 Student</button>
+        <button id="tab-btn-org" onclick="switchLoginRoleTab('org')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🏢 Org</button>
+        <button id="tab-btn-admin" onclick="switchLoginRoleTab('admin')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">⚙️ Admin</button>
+      </div>
+
+      <!-- STUDENT FORM -->
+      <form id="form-role-student" onsubmit="executeStudentAuth(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Registered Email Address</label>
+          <input type="email" id="login-student-email" required placeholder="student@example.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Registered Mobile Number</label>
+          <input type="tel" id="login-student-phone" required placeholder="+91 9876543210" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition">
+          Sign In as Student →
+        </button>
+      </form>
+
+      <!-- ORGANIZATION FORM -->
+      <form id="form-role-org" onsubmit="executeOrgAuth(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Organization Email / ID</label>
+          <input type="text" id="login-org-email" required placeholder="org@college.edu.in" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Institutional Passcode</label>
+          <input type="password" id="login-org-code" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-emerald-600/25 transition">
+          Sign In as Organization →
+        </button>
+      </form>
+
+      <!-- ADMIN FORM -->
+      <form id="form-role-admin" onsubmit="executeAdminAuth(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Administrator Email</label>
+          <input type="email" id="login-admin-email" required placeholder="admin@careergraspp.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Master Access Key</label>
+          <input type="password" id="login-admin-key" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-amber-600/25 transition">
+          Sign In as Admin →
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= STUDENT REGISTRATION MODAL ================= -->
+  <div id="student-info-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 md:p-8 space-y-6">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <div>
+          <h3 class="font-extrabold text-xl text-slate-900">Student Registration</h3>
+          <p class="text-xs text-slate-500">Stored securely in Firebase Cloud Database</p>
+        </div>
+        <button onclick="closeStudentInfoModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">&times;</button>
+      </div>
+
+      <form id="student-registration-form" onsubmit="handleRegistrationSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+          <input type="text" id="reg-student-name" required placeholder="e.g. Rahul Sharma" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="reg-student-email" required placeholder="student@example.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
+          <input type="tel" id="reg-student-phone" required placeholder="+91 9876543210" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition">
+          Continue to Payment →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= INLINE VIDEO PLAYER MODAL ================= -->
+  <div id="video-player-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col p-4 md:p-6 space-y-4">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+        <h4 id="video-modal-title" class="font-extrabold text-sm md:text-base text-slate-900 truncate max-w-lg"></h4>
+        <button onclick="closeVideoPlayerModal()" class="text-slate-400 hover:text-slate-800 font-bold text-2xl px-2">&times;</button>
+      </div>
+      <div id="video-container-box" class="relative w-full aspect-video min-h-[380px] md:min-h-[460px] bg-black rounded-xl overflow-hidden flex items-center justify-center shadow-inner border border-slate-200"></div>
+      <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 pt-2 gap-3 border-t border-slate-200">
+        <p class="text-[11px] text-slate-500">Careergraspp Streaming Player</p>
+        <a id="video-pdf-link" href="#" target="_blank" class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition flex items-center justify-center">
+          📄 View Session PDF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-100 border-t border-slate-200 py-8 px-6 text-center text-xs text-slate-600 w-full">
+    © 2026 Careergraspp LMS. Powered by Firebase Firestore.
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* FIREBASE CONFIGURATION */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBh9VQBgh3dSRug89_2NaVEOD7GPhHKvyE",
+      authDomain: "careergrasppfinal.firebaseapp.com",
+      projectId: "careergrasppfinal",
+      storageBucket: "careergrasppfinal.firebasestorage.app",
+      messagingSenderId: "243374148181",
+      appId: "1:243374148181:web:7f6a37b9ac71caf76022dc"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    const RAZORPAY_KEY_ID = "rzp_test_TXFnqgy3pZvwzL"; 
+    let pendingCourseIdToEnroll = null;
+
+    const samplePdfLinks = [
+      "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      "https://www.orimi.com/pdf-test.pdf"
+    ];
+
+    const videoUrls = [
+      "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing",
+      "https://drive.google.com/file/d/1uXC7EsUOUNzE3Mal6Z7pFpiqbTspbMZu/view?usp=sharing",
+      "https://drive.google.com/file/d/1XUjqs8ZXdS7czBPHvmRwckQ-_0aZctbw/view?usp=sharing",
+      "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing"
+    ];
+
+    const courseTitlesList = [
+      "Corporate Communication & Etiquette", "GD & Personal Interview Mastery", "Quantitative Aptitude & Logic",
+      "Resume Building & LinkedIn Branding", "Emotional Intelligence & Workplace Empathy", "Time Management & Productivity Hacks",
+      "Public Speaking & Stage Confidence", "Critical Thinking & Problem Solving", "Leadership & Team Dynamics",
+      "Negotiation & Conflict Resolution", "Workplace Adaptability & Growth Mindset", "Business Email & Report Writing",
+      "Professional Ethics & Workplace Integrity", "Stress Management & Work-Life Balance", "Decision Making Under Pressure",
+      "Networking & Relationship Building", "Creative Thinking & Innovation", "Interpersonal Skills & Active Listening"
+    ];
+
+    const pricesList = [250, 499, 399, 299, 349, 299, 449, 399, 499, 349, 299, 249, 199, 299, 399, 349, 299, 249];
+    const imgsList = [
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop"
+    ];
+
+    const softSkillsCourses = courseTitlesList.map((title, idx) => {
+      const id = idx + 1;
+      return {
+        id: id,
+        title: title,
+        price: pricesList[idx],
+        originalPrice: 2999,
+        parts: "4-Part Series",
+        image: imgsList[idx],
+        bullets: [
+          `Core Principles of ${title}`,
+          "Real-World Corporate Exercises",
+          "Includes 4 Video Parts & 4 PDF Guides"
+        ],
+        modulesOverview: [
+          {
+            title: `MODULE 1: FOUNDATIONS OF ${title.toUpperCase()}`,
+            points: [
+              `Understanding the core principles and psychological fundamentals of ${title}.`,
+              "Overcoming mental hesitation, building confidence, and setting baseline metrics.",
+              "Identifying common pitfalls faced by entry-level candidates."
+            ]
+          },
+          {
+            title: `MODULE 2: STRATEGIC EXECUTION & DRILLS`,
+            points: [
+              `Step-by-step framework to master ${title} in fast-paced environments.`,
+              "Active listening, clear articulation, and situational adaptation.",
+              "Interactive drills for campus placement interviews and corporate environments."
+            ]
+          },
+          {
+            title: `MODULE 3: REAL-WORLD CASE STUDIES & SCENARIOS`,
+            points: [
+              "Detailed breakdown of actual MNC and campus recruitment scenarios.",
+              "Handling high-pressure situations, difficult managers, and tricky questions.",
+              "Constructive feedback loop and peer practice frameworks."
+            ]
+          },
+          {
+            title: `MODULE 4: MASTERY, INTEGRATION & CERTIFICATION`,
+            points: [
+              "Synthesizing all tools for long-term career growth.",
+              "Executive presence, email etiquette, and professional body language alignment.",
+              "Final comprehensive assessment and verified certificate unlocks."
+            ]
+          }
+        ],
+        partsList: [
+          {
+            partTitle: `Part 1: Fundamentals & Core Principles of ${title}`,
+            lessons: [
+              { title: `Lesson 1.1: Introduction & Baseline Concepts`, duration: "10 mins", videoUrl: videoUrls[0], pdfUrl: samplePdfLinks[0] }
+            ]
+          },
+          {
+            partTitle: `Part 2: Step-by-Step Strategic Frameworks`,
+            lessons: [
+              { title: `Lesson 2.1: Practical Drills & Articulation Techniques`, duration: "12 mins", videoUrl: videoUrls[1], pdfUrl: samplePdfLinks[1] }
+            ]
+          },
+          {
+            partTitle: `Part 3: Corporate Scenarios & Case Analysis`,
+            lessons: [
+              { title: `Lesson 3.1: Handling High-Pressure Situations`, duration: "14 mins", videoUrl: videoUrls[2], pdfUrl: samplePdfLinks[0] }
+            ]
+          },
+          {
+            partTitle: `Part 4: Final Masterclass & Placement Readiness`,
+            lessons: [
+              { title: `Lesson 4.1: Executive Integration & Assessment`, duration: "15 mins", videoUrl: videoUrls[3], pdfUrl: samplePdfLinks[1] }
+            ]
+          }
+        ],
+        keyTakeaways: [
+          `Master the fundamental pillars of ${title} for campus placement success.`,
+          "Learn step-by-step techniques to eliminate hesitation and speak with authority.",
+          "Understand how hiring managers evaluate non-verbal cues and body language.",
+          "Gain practical frameworks to analyze complex workplace scenarios rapidly.",
+          "Structure professional responses using proven industry frameworks like STAR.",
+          "Develop strong interpersonal adaptability across cross-functional teams.",
+          "Learn to manage high-pressure situations and turn conflicts into solutions.",
+          "Build executive presence suitable for corporate client and leadership interactions.",
+          "Utilize downloadable session PDF guides to practice offline before interviews.",
+          "Receive a verified completion certificate to highlight on your resume and LinkedIn."
+        ]
+      };
+    });
+
+    function renderCoursesGrid() {
+      const container = document.getElementById('courses-grid-container');
+      container.innerHTML = "";
+      softSkillsCourses.forEach((course) => {
+        container.innerHTML += `
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-indigo-400 hover:shadow-xl transition group">
+            <div>
+              <div class="h-48 w-full bg-slate-100 overflow-hidden relative">
+                <img src="${course.image}" alt="${course.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] px-2.5 py-1 rounded-full font-extrabold shadow">₹${course.price}</span>
+                <span class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold shadow">${course.parts}</span>
+              </div>
+              <div class="p-6 space-y-3">
+                <h3 class="text-xl font-extrabold text-slate-900">${course.title}</h3>
+                <ul class="space-y-2 text-xs text-slate-600">
+                  ${course.bullets.map(b => `<li class="flex items-center"><span class="w-1.5 h-1.5 bg-indigo-600 rounded-full mr-2 flex-shrink-0"></span>${b}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+            <div class="p-6 pt-0">
+              <button onclick="openCourseModal(${course.id})" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center shadow-md shadow-indigo-600/20">
+                <span>View Course (₹${course.price})</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    renderCoursesGrid();
+
+    function openCourseModal(courseId) {
+      const course = softSkillsCourses.find(c => c.id === courseId);
+      if (!course) return;
+
+      document.getElementById('modal-course-img').src = course.image;
+      document.getElementById('modal-course-title').textContent = course.title;
+      document.getElementById('modal-course-price').textContent = `₹${course.price}`;
+      document.getElementById('modal-course-original-price').textContent = `₹${course.originalPrice}`;
+      
+      const enrollBtn = document.getElementById('modal-enroll-btn');
+      enrollBtn.textContent = `Pay ₹${course.price} & Enroll Now`;
+      enrollBtn.onclick = function() { startEnrollmentFlow(course.id); };
+
+      const descContainer = document.getElementById('modal-course-desc');
+      descContainer.innerHTML = "";
+      course.modulesOverview.forEach((mod) => {
+        descContainer.innerHTML += `
+          <div class="border-l-4 border-indigo-600 bg-indigo-50/50 p-4 rounded-r-xl space-y-2">
+            <h4 class="font-extrabold text-slate-900 text-sm tracking-tight uppercase">${mod.title}</h4>
+            <ul class="space-y-1.5 pl-2">
+              ${mod.points.map(pt => `<li class="flex items-start text-xs text-slate-700"><span class="text-indigo-600 font-bold mr-2">•</span><span>${pt}</span></li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+
+      const accordionContainer = document.getElementById('modal-parts-accordion-list');
+      accordionContainer.innerHTML = "";
+      course.partsList.forEach((part, pIdx) => {
+        const partId = `part_accordion_${pIdx}`;
+        let lessonsHtml = part.lessons.map((les) => `
+          <div class="p-3.5 bg-white border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-slate-800 shadow-sm">
+            <div class="flex items-center space-x-3">
+              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0">${pIdx + 1}</span>
+              <span class="text-xs font-semibold text-slate-800">${les.title} <span class="text-[10px] text-slate-500 font-normal">(${les.duration})</span></span>
+            </div>
+            <div class="flex items-center space-x-2 flex-shrink-0">
+              <button onclick="playLessonVideo('${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                ▶ Play Video
+              </button>
+              <a href="${les.pdfUrl}" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition flex items-center">
+                📄 View PDF
+              </a>
+            </div>
+          </div>
+        `).join('');
+
+        accordionContainer.innerHTML += `
+          <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+            <button onclick="togglePartAccordion('${partId}')" class="w-full p-4 bg-slate-100 text-slate-900 font-bold text-sm flex items-center justify-between hover:bg-slate-200 transition border-b border-slate-200">
+              <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600 mr-3"></span>${part.partTitle}</span>
+              <span class="text-xs text-indigo-600 font-semibold">Expand Video & PDF Access ▼</span>
+            </button>
+            <div id="${partId}" class="p-4 bg-slate-50 space-y-3 hidden">${lessonsHtml}</div>
+          </div>
+        `;
+      });
+
+      const takeawaysContainer = document.getElementById('modal-course-takeaways');
+      takeawaysContainer.innerHTML = "";
+      course.keyTakeaways.forEach((pt, kIdx) => {
+        takeawaysContainer.innerHTML += `
+          <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-start space-x-2 shadow-sm">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
+            <span class="text-slate-700 font-medium">${pt}</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('course-detail-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    async function startEnrollmentFlow(courseId) {
+      pendingCourseIdToEnroll = courseId;
+      const activeEmail = localStorage.getItem('careergraspp_active_email');
+
+      if (activeEmail) {
+        const userDoc = await db.collection('students').doc(activeEmail).get();
+        if (userDoc.exists) {
+          const profile = userDoc.data();
+          initiateRazorpayPayment(courseId, profile.name, profile.email, profile.phone);
+          return;
+        }
+      }
+
+      document.getElementById('student-info-modal').classList.remove('hidden');
+    }
+
+    function handleRegistrationSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('reg-student-name').value.trim();
+      const email = document.getElementById('reg-student-email').value.trim().toLowerCase();
+      const phone = document.getElementById('reg-student-phone').value.trim();
+
+      if (!name || !email || !phone) return alert("Please fill in all fields!");
+
+      document.getElementById('student-info-modal').classList.add('hidden');
+      if (pendingCourseIdToEnroll) {
+        initiateRazorpayPayment(pendingCourseIdToEnroll, name, email, phone);
+      }
+    }
+
+    function closeStudentInfoModal() {
+      document.getElementById('student-info-modal').classList.add('hidden');
+    }
+
+    function initiateRazorpayPayment(courseId, studentName, studentEmail, studentPhone) {
+      const course = softSkillsCourses.find(c => c.id === courseId);
+      if (!course) return;
+
+      const options = {
+        "key": RAZORPAY_KEY_ID,
+        "amount": course.price * 100,
+        "currency": "INR",
+        "name": "Careergraspp Soft Skills Academy",
+        "description": `Enrollment for ${course.title}`,
+        "image": "careergraspplogo.jpg",
+        "handler": function (response) {
+          onPaymentSuccess(response.razorpay_payment_id, course, studentName, studentEmail, studentPhone);
+        },
+        "prefill": {
+          "name": studentName,
+          "email": studentEmail,
+          "contact": studentPhone
+        },
+        "theme": { "color": "#4F46E5" }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    async function onPaymentSuccess(paymentId, course, name, email, phone) {
+      const userDocRef = db.collection('students').doc(email);
+
+      try {
+        await userDocRef.set({
+          name: name,
+          email: email,
+          phone: phone,
+          enrolledCourses: firebase.firestore.FieldValue.arrayUnion(course.id),
+          completedLessons: firebase.firestore.FieldValue.arrayUnion(),
+          transactions: firebase.firestore.FieldValue.arrayUnion({
+            paymentId: paymentId,
+            courseId: course.id,
+            courseTitle: course.title,
+            amount: course.price,
+            date: new Date().toLocaleString()
+          }),
+          joinedDate: new Date().toLocaleDateString()
+        }, { merge: true });
+
+        localStorage.setItem('careergraspp_active_email', email);
+        localStorage.setItem('careergraspp_active_phone', phone);
+        localStorage.setItem('careergraspp_role', 'student');
+
+        alert(`🎉 Payment Successful!\n\nWelcome ${name}!\nTransaction ID: ${paymentId}\nCourse Unlocked: ${course.title}\n\nRedirecting to your Student Portal...`);
+        window.location.href = `course.html?unlocked=${course.id}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+      } catch (err) {
+        console.error("Firestore Error:", err);
+        alert(`Payment received, but error saving to Firebase: ${err.message}`);
+      }
+    }
+
+    /* UNIFIED LOGIN MODAL & ROLE TAB HANDLERS */
+    function openUnifiedLoginModal(defaultRole) {
+      toggleLoginDropdown();
+      switchLoginRoleTab(defaultRole || 'student');
+      document.getElementById('unified-login-modal').classList.remove('hidden');
+    }
+
+    function closeUnifiedLoginModal() {
+      document.getElementById('unified-login-modal').classList.add('hidden');
+    }
+
+    function switchLoginRoleTab(role) {
+      const studentTab = document.getElementById('tab-btn-student');
+      const orgTab = document.getElementById('tab-btn-org');
+      const adminTab = document.getElementById('tab-btn-admin');
+
+      const studentForm = document.getElementById('form-role-student');
+      const orgForm = document.getElementById('form-role-org');
+      const adminForm = document.getElementById('form-role-admin');
+
+      [studentForm, orgForm, adminForm].forEach(f => f.classList.add('hidden'));
+      [studentTab, orgTab, adminTab].forEach(t => {
+        t.className = "py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+      });
+
+      if (role === 'student') {
+        studentForm.classList.remove('hidden');
+        studentTab.className = "py-2.5 rounded-lg bg-white text-indigo-600 shadow-sm font-bold transition";
+      } else if (role === 'org') {
+        orgForm.classList.remove('hidden');
+        orgTab.className = "py-2.5 rounded-lg bg-white text-emerald-600 shadow-sm font-bold transition";
+      } else if (role === 'admin') {
+        adminForm.classList.remove('hidden');
+        adminTab.className = "py-2.5 rounded-lg bg-white text-amber-600 shadow-sm font-bold transition";
+      }
+    }
+
+    async function executeStudentAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-student-email').value.trim().toLowerCase();
+      const phone = document.getElementById('login-student-phone').value.trim();
+
+      if (!email || !phone) return alert("Please enter both Email and Phone number.");
+
+      try {
+        const docRef = db.collection('students').doc(email);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+          const profile = doc.data();
+          const dbPhone = (profile.phone || "").replace(/[^0-9]/g, '');
+          const inputPhone = phone.replace(/[^0-9]/g, '');
+
+          if (dbPhone && inputPhone && !dbPhone.includes(inputPhone) && !inputPhone.includes(dbPhone)) {
+            alert("⚠️ Mobile number mismatch. Please enter the phone number used during enrollment.");
+            return;
+          }
+
+          localStorage.setItem('careergraspp_active_email', email);
+          localStorage.setItem('careergraspp_active_phone', phone);
+          localStorage.setItem('careergraspp_role', 'student');
+
+          closeUnifiedLoginModal();
+          window.location.href = `course.html?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+        } else {
+          alert(`No registered student account found for ${email}. Please enroll in a course first.`);
+        }
+      } catch (err) {
+        alert("Database login error: " + err.message);
+      }
+    }
+
+    function executeOrgAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-org-email').value.trim();
+      localStorage.setItem('careergraspp_active_email', email);
+      localStorage.setItem('careergraspp_role', 'org');
+      closeUnifiedLoginModal();
+      window.location.href = "course.html";
+    }
+
+    function executeAdminAuth(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-admin-email').value.trim();
+      localStorage.setItem('careergraspp_active_email', email);
+      localStorage.setItem('careergraspp_role', 'admin');
+      closeUnifiedLoginModal();
+      window.location.href = "course.html";
+    }
+
+    function togglePartAccordion(partId) {
+      const el = document.getElementById(partId);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function closeCourseModal() {
+      document.getElementById('course-detail-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function playLessonVideo(title, rawVideoUrl, rawPdfUrl) {
+      document.getElementById('video-modal-title').textContent = title;
+      const containerBox = document.getElementById('video-container-box');
+      let driveFileId = "";
+      if (rawVideoUrl.includes('drive.google.com')) {
+        const driveIdMatch = rawVideoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (driveIdMatch && driveIdMatch[1]) driveFileId = driveIdMatch[1];
+      }
+
+      if (driveFileId) {
+        const embedUrl = `https://drive.google.com/file/d/${driveFileId}/preview`;
+        containerBox.innerHTML = `
+          <div class="relative w-full h-full">
+            <iframe src="${embedUrl}" class="w-full h-full min-h-[380px] md:min-h-[450px] rounded-xl border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            <div class="absolute top-0 right-0 w-14 h-14 bg-black z-10"></div>
+          </div>`;
+      } else {
+        containerBox.innerHTML = `<video class="w-full h-full object-contain rounded-xl" controls autoplay><source src="${rawVideoUrl}" type="video/mp4" /></video>`;
+      }
+
+      document.getElementById('video-pdf-link').href = rawPdfUrl;
+      document.getElementById('video-player-modal').classList.remove('hidden');
+    }
+
+    function closeVideoPlayerModal() {
+      document.getElementById('video-container-box').innerHTML = "";
+      document.getElementById('video-player-modal').classList.add('hidden');
+    }
+
+    function toggleLoginDropdown() {
+      document.getElementById('login-dropdown-menu').classList.toggle('hidden');
+      document.getElementById('dropdown-arrow').classList.toggle('rotate-180');
+    }
+  </script>
+</body>
+</html>
