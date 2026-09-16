@@ -20,7 +20,7 @@
 </head>
 <body class="bg-white text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
 
-  <!-- ================= NAVIGATION BAR (FULL SCREEN WIDTH) ================= -->
+  <!-- ================= NAVIGATION BAR ================= -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm w-full">
     <div class="w-full px-4 md:px-10 lg:px-12 py-4 flex items-center justify-between">
       
@@ -77,7 +77,7 @@
     </div>
   </header>
 
-  <!-- ================= HERO BANNER (FULL WIDTH) ================= -->
+  <!-- ================= HERO BANNER ================= -->
   <section class="w-full bg-white flex items-center justify-center my-4 px-4 md:px-10 lg:px-12">
     <div class="w-full mx-auto flex items-center justify-center">
       <img 
@@ -89,7 +89,7 @@
     </div>
   </section>
 
-  <!-- ================= COURSES LIST SECTION (3 PER ROW FULL WIDTH) ================= -->
+  <!-- ================= COURSES LIST SECTION ================= -->
   <section id="courses-section" class="py-16 bg-slate-50 border-t border-slate-200 w-full">
     <div class="w-full px-4 md:px-10 lg:px-12">
       <div class="text-center mb-16 space-y-3">
@@ -676,7 +676,6 @@
       }
     }
 
-    /* UNIFIED LOGIN MODAL & ROLE TAB HANDLERS */
     function openUnifiedLoginModal(defaultRole) {
       toggleLoginDropdown();
       switchLoginRoleTab(defaultRole || 'student');
