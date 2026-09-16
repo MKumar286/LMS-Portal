@@ -94,12 +94,12 @@
     <div class="w-full px-4 md:px-10 lg:px-12">
       <div class="text-center mb-16 space-y-3">
         <h2 class="text-3xl font-extrabold text-slate-900">Featured Soft Skills Programs</h2>
-        <p class="text-sm text-slate-600 max-w-2xl mx-auto">Master essential corporate skills with our 18 specialized programs. Click "View Course" to inspect syllabus & enrollment details.</p>
+        <p class="text-sm text-slate-600 max-w-2xl mx-auto">Master essential corporate skills with our specialized programs. Click "View Course" to inspect syllabus & enrollment details.</p>
       </div>
 
       <!-- 3 CARDS PER ROW GRID -->
       <div id="courses-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-        <!-- Injected via JavaScript -->
+        <!-- Injected dynamically via JavaScript -->
       </div>
     </div>
   </section>
@@ -132,7 +132,7 @@
           <div class="bg-white border border-slate-200 p-6 md:p-8 rounded-2xl space-y-4 shadow-sm">
             <h3 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center">
               <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              Complete Course Syllabus & 4 Module Breakdown
+              Complete Course Syllabus & Module Breakdown
             </h3>
             <div id="modal-course-desc" class="space-y-6 text-sm text-slate-700"></div>
           </div>
@@ -141,7 +141,7 @@
             <div class="flex items-center justify-between">
               <h3 class="text-2xl font-bold text-slate-900 flex items-center">
                 <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Course Video Parts & Sub-Lessons (4 Modules)
+                Course Video Parts & Sub-Lessons
               </h3>
               <span class="text-xs text-indigo-600 font-semibold">Click any Part to expand lessons</span>
             </div>
@@ -174,7 +174,7 @@
             <div class="space-y-3 text-xs text-slate-600">
               <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>4 High HD Video Modules Per Course</span>
+                <span>HD Video Modules Per Course</span>
               </div>
               <div class="flex items-center space-x-2">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -256,7 +256,7 @@
       <form id="form-role-admin" onsubmit="executeAdminAuth(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Administrator Email</label>
-          <input type="email" id="login-admin-email" required placeholder="admin@careergraspp.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+          <input type="email" id="login-admin-email" required placeholder="use-careergraspp@gmail.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Master Access Key</label>
@@ -385,7 +385,7 @@
       "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop"
     ];
 
-    const softSkillsCourses = courseTitlesList.map((title, idx) => {
+    const defaultCourses = courseTitlesList.map((title, idx) => {
       const id = idx + 1;
       return {
         id: id,
@@ -474,22 +474,49 @@
       };
     });
 
+    /* GET ACTIVE COURSES FROM LOCALSTORAGE (SYNCED WITH ADMIN CONTROL PANEL) */
+    function getActiveCoursesList() {
+      const stored = localStorage.getItem('careergraspp_courses');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch (e) {
+          console.error("Error parsing stored courses from localStorage:", e);
+        }
+      }
+      return defaultCourses;
+    }
+
     function renderCoursesGrid() {
       const container = document.getElementById('courses-grid-container');
+      if (!container) return;
+      
       container.innerHTML = "";
-      softSkillsCourses.forEach((course) => {
+      const activeCourses = getActiveCoursesList();
+
+      activeCourses.forEach((course) => {
+        const partsText = course.partsList ? `${course.partsList.length}-Part Series` : (course.parts || "4-Part Series");
+        const bulletItems = course.bullets || [
+          `Core Principles of ${course.title}`,
+          "Real-World Corporate Exercises",
+          `Includes ${course.partsList ? course.partsList.length : 4} Video Parts & PDF Guides`
+        ];
+
         container.innerHTML += `
           <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-indigo-400 hover:shadow-xl transition group">
             <div>
               <div class="h-52 w-full bg-slate-100 overflow-hidden relative">
                 <img src="${course.image}" alt="${course.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                 <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] px-2.5 py-1 rounded-full font-extrabold shadow">₹${course.price}</span>
-                <span class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold shadow">${course.parts}</span>
+                <span class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold shadow">${partsText}</span>
               </div>
               <div class="p-6 space-y-3">
                 <h3 class="text-xl font-extrabold text-slate-900">${course.title}</h3>
                 <ul class="space-y-2 text-xs text-slate-600">
-                  ${course.bullets.map(b => `<li class="flex items-center"><span class="w-1.5 h-1.5 bg-indigo-600 rounded-full mr-2 flex-shrink-0"></span>${b}</li>`).join('')}
+                  ${bulletItems.map(b => `<li class="flex items-center"><span class="w-1.5 h-1.5 bg-indigo-600 rounded-full mr-2 flex-shrink-0"></span>${b}</li>`).join('')}
                 </ul>
               </div>
             </div>
@@ -503,16 +530,20 @@
       });
     }
 
-    renderCoursesGrid();
+    // INITIAL RENDER ON PAGE LOAD
+    document.addEventListener('DOMContentLoaded', function() {
+      renderCoursesGrid();
+    });
 
     function openCourseModal(courseId) {
-      const course = softSkillsCourses.find(c => c.id === courseId);
+      const activeCourses = getActiveCoursesList();
+      const course = activeCourses.find(c => c.id === courseId);
       if (!course) return;
 
       document.getElementById('modal-course-img').src = course.image;
       document.getElementById('modal-course-title').textContent = course.title;
       document.getElementById('modal-course-price').textContent = `₹${course.price}`;
-      document.getElementById('modal-course-original-price').textContent = `₹${course.originalPrice}`;
+      document.getElementById('modal-course-original-price').textContent = `₹${course.originalPrice || Math.round(course.price * 1.5)}`;
       
       const enrollBtn = document.getElementById('modal-enroll-btn');
       enrollBtn.textContent = `Pay ₹${course.price} & Enroll Now`;
@@ -520,12 +551,13 @@
 
       const descContainer = document.getElementById('modal-course-desc');
       descContainer.innerHTML = "";
-      course.modulesOverview.forEach((mod) => {
+      const modules = course.modulesOverview || [];
+      modules.forEach((mod) => {
         descContainer.innerHTML += `
           <div class="border-l-4 border-indigo-600 bg-indigo-50/50 p-4 rounded-r-xl space-y-2">
             <h4 class="font-extrabold text-slate-900 text-sm tracking-tight uppercase">${mod.title}</h4>
             <ul class="space-y-1.5 pl-2">
-              ${mod.points.map(pt => `<li class="flex items-start text-xs text-slate-700"><span class="text-indigo-600 font-bold mr-2">•</span><span>${pt}</span></li>`).join('')}
+              ${(mod.points || []).map(pt => `<li class="flex items-start text-xs text-slate-700"><span class="text-indigo-600 font-bold mr-2">•</span><span>${pt}</span></li>`).join('')}
             </ul>
           </div>
         `;
@@ -533,16 +565,17 @@
 
       const accordionContainer = document.getElementById('modal-parts-accordion-list');
       accordionContainer.innerHTML = "";
-      course.partsList.forEach((part, pIdx) => {
+      const parts = course.partsList || [];
+      parts.forEach((part, pIdx) => {
         const partId = `part_accordion_${pIdx}`;
-        let lessonsHtml = part.lessons.map((les) => `
+        let lessonsHtml = (part.lessons || []).map((les) => `
           <div class="p-3.5 bg-white border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-slate-800 shadow-sm">
             <div class="flex items-center space-x-3">
               <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0">${pIdx + 1}</span>
-              <span class="text-xs font-semibold text-slate-800">${les.title} <span class="text-[10px] text-slate-500 font-normal">(${les.duration})</span></span>
+              <span class="text-xs font-semibold text-slate-800">${les.title} <span class="text-[10px] text-slate-500 font-normal">(${les.duration || '10 mins'})</span></span>
             </div>
             <div class="flex items-center space-x-2 flex-shrink-0">
-              <button onclick="playLessonVideo('${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+              <button onclick="playLessonVideo('${les.title.replace(/'/g, "\\'")}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
                 ▶ Play Video
               </button>
               <a href="${les.pdfUrl}" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition flex items-center">
@@ -565,7 +598,19 @@
 
       const takeawaysContainer = document.getElementById('modal-course-takeaways');
       takeawaysContainer.innerHTML = "";
-      course.keyTakeaways.forEach((pt, kIdx) => {
+      const takeaways = course.keyTakeaways || [
+        `Master the fundamental pillars of ${course.title} for campus placement success.`,
+        "Learn step-by-step techniques to eliminate hesitation and speak with authority.",
+        "Understand how hiring managers evaluate non-verbal cues and body language.",
+        "Gain practical frameworks to analyze complex workplace scenarios rapidly.",
+        "Structure professional responses using proven industry frameworks like STAR.",
+        "Develop strong interpersonal adaptability across cross-functional teams.",
+        "Learn to manage high-pressure situations and turn conflicts into solutions.",
+        "Build executive presence suitable for corporate client and leadership interactions.",
+        "Utilize downloadable session PDF guides to practice offline before interviews.",
+        "Receive a verified completion certificate to highlight on your resume and LinkedIn."
+      ];
+      takeaways.forEach((pt, kIdx) => {
         takeawaysContainer.innerHTML += `
           <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-start space-x-2 shadow-sm">
             <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
@@ -613,7 +658,8 @@
     }
 
     function initiateRazorpayPayment(courseId, studentName, studentEmail, studentPhone) {
-      const course = softSkillsCourses.find(c => c.id === courseId);
+      const activeCourses = getActiveCoursesList();
+      const course = activeCourses.find(c => c.id === courseId);
       if (!course) return;
 
       const options = {
@@ -756,32 +802,30 @@
       window.location.href = "course.html";
     }
 
-function executeAdminAuth(event) {
-  event.preventDefault();
+    function executeAdminAuth(event) {
+      event.preventDefault();
 
-  const emailInput = document.getElementById('login-admin-email');
-  const keyInput = document.getElementById('login-admin-key');
+      const emailInput = document.getElementById('login-admin-email');
+      const keyInput = document.getElementById('login-admin-key');
 
-  const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
-  const key = keyInput ? keyInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+      const key = keyInput ? keyInput.value.trim() : '';
 
-  const TARGET_EMAIL = "careergraspp@gmail.com";
-  const TARGET_KEY = "Kumar@2422";
+      const TARGET_KEY = "Kumar@2422";
 
-  if (email === TARGET_EMAIL && key === TARGET_KEY) {
-    localStorage.setItem('careergraspp_active_email', email);
-    localStorage.setItem('careergraspp_role', 'admin');
+      if ((email === "use-careergraspp@gmail.com" || email === "careergraspp@gmail.com") && key === TARGET_KEY) {
+        localStorage.setItem('careergraspp_active_email', email);
+        localStorage.setItem('careergraspp_role', 'admin');
 
-    if (typeof closeUnifiedLoginModal === 'function') {
-      closeUnifiedLoginModal();
+        if (typeof closeUnifiedLoginModal === 'function') {
+          closeUnifiedLoginModal();
+        }
+        
+        window.location.href = "admin-database.html";
+      } else {
+        alert(`❌ Invalid Admin Credentials!\n\nExpected:\nEmail: use-careergraspp@gmail.com\nPassword: ${TARGET_KEY}\n\nYou Entered:\nEmail: ${email}\nPassword: ${key}`);
+      }
     }
-    
-    // Redirect directly to the admin database panel
-    window.location.href = "admin-database.html";
-  } else {
-    alert(`❌ Invalid Admin Credentials!\n\nExpected:\nEmail: ${TARGET_EMAIL}\nPassword: ${TARGET_KEY}\n\nYou Entered:\nEmail: ${email}\nPassword: ${key}`);
-  }
-}
 
     function togglePartAccordion(partId) {
       const el = document.getElementById(partId);
