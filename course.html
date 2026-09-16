@@ -92,7 +92,7 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-200 pb-4 gap-3">
         <div>
           <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Enrolled Learning Modules</h1>
-          <p class="text-xs text-slate-500 mt-0.5">Purchased courses arranged horizontally across maximum screen width with 6-month access counters.</p>
+          <p class="text-xs text-slate-500 mt-0.5">Course syllabus modules and video/PDF lessons displayed side-by-side.</p>
         </div>
         <a href="index.html#courses-section" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition shadow-sm">
           + Explore More Courses
@@ -315,18 +315,6 @@
               { key: `${id}_4_1`, title: "Lesson 4.1: Placement Assessment & Certification", duration: "15 mins", videoUrl: videoUrls[3], pdfUrl: samplePdfLinks[1] }
             ]
           }
-        ],
-        keyTakeaways: [
-          `Master fundamental pillars of ${title} for campus placement.`,
-          "Learn techniques to eliminate hesitation and speak with authority.",
-          "Understand non-verbal cues and body language evaluation.",
-          "Gain practical frameworks to analyze complex workplace scenarios.",
-          "Structure professional responses using proven frameworks like STAR.",
-          "Develop strong interpersonal adaptability across cross-functional teams.",
-          "Manage high-pressure situations and turn conflicts into solutions.",
-          "Build executive presence suitable for corporate client interactions.",
-          "Utilize downloadable session PDF guides to practice offline.",
-          "Receive verified completion certificate for LinkedIn & resume."
         ]
       };
     });
@@ -418,7 +406,7 @@
       renderDashboardGrid(profile);
     }
 
-    /* RENDER HIGH-DENSITY CLEAN COURSE CARDS */
+    /* RENDER 2-COLUMN SIDE-BY-SIDE SIDEBAR CARDS */
     function renderDashboardGrid(profile) {
       const container = document.getElementById('student-courses-grid');
       container.innerHTML = "";
@@ -448,31 +436,31 @@
 
         let modulesHtml = (course.modulesOverview || []).map(mod => `
           <div class="bg-indigo-50/70 border-l-2 border-indigo-600 p-2.5 rounded-r-lg space-y-1">
-            <p class="font-bold text-[10px] text-slate-900 uppercase tracking-wide">${mod.title}</p>
-            <ul class="space-y-0.5 pl-1">
-              ${mod.points.map(pt => `<li class="text-[10px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1">•</span><span>${pt}</span></li>`).join('')}
+            <p class="font-bold text-[11px] text-slate-900 uppercase tracking-wide">${mod.title}</p>
+            <ul class="space-y-1 pl-1">
+              ${mod.points.map(pt => `<li class="text-[11px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1.5">•</span><span>${pt}</span></li>`).join('')}
             </ul>
           </div>
         `).join('');
 
         let partsHtml = (course.partsList || []).map((part) => `
-          <div class="space-y-1">
-            <p class="font-bold text-[10px] text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">${part.partTitle}</p>
+          <div class="space-y-1.5">
+            <p class="font-bold text-[11px] text-slate-800 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">${part.partTitle}</p>
             <div class="space-y-1">
               ${part.lessons.map(les => {
                 const isCompleted = completedSet.has(les.key);
                 return `
-                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-1.5 text-[10px]">
-                    <div class="flex items-center space-x-1.5 truncate">
+                  <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center space-x-2 truncate">
                       ${isCompleted 
-                        ? `<span class="bg-emerald-100 text-emerald-700 border border-emerald-300 font-extrabold text-[9px] px-1.5 py-0.5 rounded flex-shrink-0">✓ Completed</span>` 
-                        : `<span class="bg-slate-200 text-slate-600 font-bold text-[9px] px-1.5 py-0.5 rounded flex-shrink-0">Pending</span>`
+                        ? `<span class="bg-emerald-100 text-emerald-700 border border-emerald-300 font-extrabold text-[9px] px-2 py-0.5 rounded flex-shrink-0">✓ Completed</span>` 
+                        : `<span class="bg-slate-200 text-slate-600 font-bold text-[9px] px-2 py-0.5 rounded flex-shrink-0">Pending</span>`
                       }
                       <span class="font-semibold text-slate-800 truncate">${les.title}</span>
                     </div>
-                    <div class="flex items-center space-x-1 flex-shrink-0">
-                      <button onclick="handleLessonAccess(${isExpired}, '${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-2.5 py-1 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded transition text-[10px]">▶ Play</button>
-                      <a href="${isExpired ? '#' : les.pdfUrl}" onclick="${isExpired ? `handleExpiredNotice(); return false;` : ''}" target="${isExpired ? '_self' : '_blank'}" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded transition text-[10px]">📄 PDF</a>
+                    <div class="flex items-center space-x-1.5 flex-shrink-0">
+                      <button onclick="handleLessonAccess(${isExpired}, '${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3 py-1.5 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded-lg transition text-xs shadow-sm">▶ Play</button>
+                      <a href="${isExpired ? '#' : les.pdfUrl}" onclick="${isExpired ? `handleExpiredNotice(); return false;` : ''}" target="${isExpired ? '_self' : '_blank'}" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-xs">📄 PDF</a>
                     </div>
                   </div>
                 `;
@@ -481,18 +469,12 @@
           </div>
         `).join('');
 
-        let takeawaysHtml = (course.keyTakeaways || []).map((pt, kIdx) => `
-          <div class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg flex items-start space-x-1.5 text-[10px]">
-            <span class="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
-            <span class="text-slate-700 font-medium leading-tight">${pt}</span>
-          </div>
-        `).join('');
-
-        // ULTRA-CLEAN HIGH-DENSITY ROW CARD
+        // 2-COLUMN SIDE-BY-SIDE ROW CARD
         container.innerHTML += `
-          <div class="bg-white border ${isExpired ? 'border-red-300' : 'border-slate-200'} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition w-full flex flex-col space-y-4 p-4 md:p-6">
+          <div class="bg-white border ${isExpired ? 'border-red-300' : 'border-slate-200'} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition w-full flex flex-col space-y-4 p-5 md:p-6">
             
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+            <!-- CARD TOP HEADER -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div class="flex items-center space-x-4">
                 <img src="${course.image}" alt="${course.title}" class="w-32 h-20 object-cover rounded-xl border border-slate-200 shadow-sm shrink-0" />
                 <div class="space-y-1">
@@ -500,8 +482,8 @@
                     <span class="bg-emerald-600 text-white text-[9px] px-2 py-0.5 rounded-full font-extrabold">✓ UNLOCKED</span>
                     ${validityBadgeHtml}
                   </div>
-                  <h3 class="text-lg font-black text-slate-900">${course.title}</h3>
-                  <p class="text-[11px] text-slate-500">6 Months Access • 4 HD Video Modules • PDF Study Support</p>
+                  <h3 class="text-xl font-black text-slate-900">${course.title}</h3>
+                  <p class="text-xs text-slate-500">6 Months Access • 4 HD Video Modules • PDF Guides</p>
                 </div>
               </div>
 
@@ -512,22 +494,25 @@
               ` : ''}
             </div>
 
-            <!-- 3-COLUMN COMPACT CONTENT GRID -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 text-[11px]">
+            <!-- 2-COLUMN SIDE-BY-SIDE CONTENT (COURSE MODULES & VIDEO LESSONS + PDF) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              <div class="space-y-2">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Course Modules</h4>
-                <div class="space-y-2">${modulesHtml}</div>
+              <!-- LEFT COLUMN: COURSE MODULES -->
+              <div class="space-y-2.5">
+                <div class="flex items-center space-x-2 pb-1 border-b border-slate-100">
+                  <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                  <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">Course Modules Syllabus</h4>
+                </div>
+                <div class="space-y-2.5">${modulesHtml}</div>
               </div>
 
-              <div class="space-y-2">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Video Lessons & PDFs</h4>
-                <div class="space-y-2">${partsHtml}</div>
-              </div>
-
-              <div class="space-y-2">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Key Takeaways</h4>
-                <div class="grid grid-cols-1 gap-1.5">${takeawaysHtml}</div>
+              <!-- RIGHT COLUMN: VIDEO LESSONS & PDF GUIDES -->
+              <div class="space-y-2.5">
+                <div class="flex items-center space-x-2 pb-1 border-b border-slate-100">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">Video Lessons & Session PDFs</h4>
+                </div>
+                <div class="space-y-2.5">${partsHtml}</div>
               </div>
 
             </div>
