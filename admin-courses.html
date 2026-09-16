@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Courses - Careergraspp Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- FIREBASE SDKs (v9 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen selection:bg-indigo-600 selection:text-white">
+
+  <!-- ================= MAIN LAYOUT CONTAINER ================= -->
+  <div class="min-h-screen flex flex-col md:flex-row w-full">
+
+    <!-- ================= ADMIN LEFT SIDEBAR ================= -->
+    <aside class="w-full md:w-56 lg:w-64 bg-slate-900 text-white p-3.5 md:p-4 shrink-0 border-r border-slate-800 md:min-h-screen md:sticky md:top-0 md:h-screen flex flex-col justify-between z-30 overflow-y-auto">
+      
+      <div class="space-y-5">
+        <!-- Brand Header -->
+        <a href="admin-database.html" class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-md">
+            ⚙️
+          </div>
+          <div>
+            <span class="text-sm font-extrabold tracking-tight text-white">Career<span class="text-indigo-400">graspp</span></span>
+            <span class="block text-[8px] text-amber-400 font-bold tracking-widest uppercase -mt-0.5">Admin Control Center</span>
+          </div>
+        </a>
+
+        <!-- Admin Info Card -->
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 space-y-1 shadow-sm">
+          <div class="flex items-center space-x-2">
+            <div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs font-bold">
+              👑
+            </div>
+            <div class="overflow-hidden">
+              <span class="block text-[8px] font-bold text-emerald-400 uppercase tracking-wider">Super Admin</span>
+              <p class="text-[11px] font-bold text-white truncate">use-careergraspp@gmail.com</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR NAVIGATION MENU -->
+        <nav class="space-y-1 pt-1">
+          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 mb-1.5">Management Portal</p>
+          
+          <a href="admin-database.html" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span>Individual Students</span>
+          </a>
+
+          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0V7m4 4V7m0 4h4m-4-4h4"/></svg>
+            <span>Manage Organization</span>
+          </a>
+
+          <a href="admin-courses.html" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm">
+            <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>Manage Courses</span>
+          </a>
+
+          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Tests</span>
+          </a>
+
+          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
+            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Quizzes</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="pt-3 border-t border-slate-800 space-y-1.5 mt-3">
+        <a href="index.html" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-bold transition flex items-center justify-center space-x-1 border border-slate-700">
+          <span>🌐 View Website</span>
+        </a>
+        <button onclick="adminLogout()" class="w-full py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-400 rounded-lg text-[11px] font-bold transition border border-red-500/30 flex items-center justify-center space-x-1">
+          <span>🚪 Admin Logout</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ================= MAIN CONTENT AREA ================= -->
+    <main class="flex-1 p-3 md:p-5 lg:p-6 min-h-screen space-y-4 overflow-y-auto">
+
+      <!-- TOP HEADER BAR -->
+      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-black text-slate-900 tracking-tight">Course Catalog Management</h2>
+          <p class="text-xs text-slate-500">Create, update, add/delete modules, video links, PDF guides, and course prices.</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="openCreateCourseModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center">
+            <span>+ Create New Course</span>
+          </button>
+          <button onclick="resetCoursesToDefault()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition border border-slate-200">
+            🔄 Reset Defaults
+          </button>
+        </div>
+      </div>
+
+      <!-- MANAGED COURSES GRID -->
+      <div id="admin-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamically Populated -->
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ================= UPDATE / CREATE COURSE MODAL ================= -->
+  <div id="course-editor-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden shadow-2xl flex flex-col">
+      
+      <!-- HEADER -->
+      <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+        <div>
+          <h3 id="course-editor-title" class="font-black text-base text-white">Update Course Details</h3>
+          <p class="text-[10px] text-indigo-300">Add or delete modules, parts, video lessons, and PDF links</p>
+        </div>
+        <button onclick="closeCourseEditorModal()" class="text-slate-400 hover:text-white font-bold text-2xl px-2">&times;</button>
+      </div>
+
+      <!-- FORM BODY -->
+      <form id="course-editor-form" onsubmit="handleSaveCourse(event)" class="p-5 overflow-y-auto space-y-6 text-xs">
+        <input type="hidden" id="editor-course-id" />
+
+        <!-- 1. GENERAL INFORMATION -->
+        <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 mr-2"></span> General Course Information
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Course Title</label>
+              <input type="text" id="editor-title" required class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 font-semibold" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Price (₹)</label>
+              <input type="number" id="editor-price" required class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 font-bold" />
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block font-bold text-slate-700 mb-1">Cover Image URL (Unsplash or Direct Image Link)</label>
+              <input type="url" id="editor-image" required class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 font-mono text-slate-600" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. MODULE-WISE SYLLABUS BREAKDOWN (DYNAMIC ADD/DELETE MODULES) -->
+        <div class="space-y-3 bg-indigo-50/50 p-4 rounded-xl border border-indigo-200">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-indigo-900 text-xs uppercase tracking-wider flex items-center">
+              <span class="w-2 h-2 rounded-full bg-indigo-600 mr-2"></span> Course Modules Overview
+            </h4>
+            <button type="button" onclick="addModuleToModal()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-[10px] transition shadow-xs">
+              + Add Module
+            </button>
+          </div>
+          
+          <div id="editor-modules-container" class="space-y-3">
+            <!-- Dynamically Rendered Modules -->
+          </div>
+        </div>
+
+        <!-- 3. PART-WISE LESSONS, VIDEO LINKS & PDF LINKS (DYNAMIC ADD/DELETE PARTS & LESSONS) -->
+        <div class="space-y-3 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-emerald-900 text-xs uppercase tracking-wider flex items-center">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 mr-2"></span> Video Lessons & Session PDFs Parts
+            </h4>
+            <button type="button" onclick="addPartToModal()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] transition shadow-xs">
+              + Add Part
+            </button>
+          </div>
+          
+          <div id="editor-parts-container" class="space-y-4">
+            <!-- Dynamically Rendered Parts & Lessons -->
+          </div>
+        </div>
+
+        <!-- SUBMIT / SAVE BUTTON -->
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeCourseEditorModal()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs transition shadow-md shadow-indigo-600/20">
+            💾 Save Course Details
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* 1. FIREBASE CONFIGURATION */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBh9VQBgh3dSRug89_2NaVEOD7GPhHKvyE",
+      authDomain: "careergrasppfinal.firebaseapp.com",
+      projectId: "careergrasppfinal",
+      storageBucket: "careergrasppfinal.firebasestorage.app",
+      messagingSenderId: "243374148181",
+      appId: "1:243374148181:web:7f6a37b9ac71caf76022dc"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    /* 2. ADMIN AUTHENTICATION GUARD */
+    document.addEventListener('DOMContentLoaded', function() {
+      const role = localStorage.getItem('careergraspp_role');
+      const email = localStorage.getItem('careergraspp_active_email');
+
+      if (role !== 'admin' || email !== 'use-careergraspp@gmail.com') {
+        const inputPass = prompt("🔐 Admin Authentication Required\nPlease enter the Admin Master Password:");
+        if (inputPass === 'Kumar@2422') {
+          localStorage.setItem('careergraspp_role', 'admin');
+          localStorage.setItem('careergraspp_active_email', 'use-careergraspp@gmail.com');
+          loadManagedCourses();
+        } else {
+          alert("❌ Unauthorized Admin Access!");
+          window.location.href = "index.html";
+        }
+      } else {
+        loadManagedCourses();
+      }
+    });
+
+    /* 3. DEFAULT COURSES CATALOG SEED */
+    const defaultSampleVideo = "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing";
+    const defaultSamplePdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+
+    const defaultCourseTitles = [
+      "Corporate Communication & Etiquette", "GD & Personal Interview Mastery", "Quantitative Aptitude & Logic",
+      "Resume Building & LinkedIn Branding", "Emotional Intelligence & Workplace Empathy", "Time Management & Productivity Hacks",
+      "Public Speaking & Stage Confidence", "Critical Thinking & Problem Solving", "Leadership & Team Dynamics",
+      "Negotiation & Conflict Resolution", "Workplace Adaptability & Growth Mindset", "Business Email & Report Writing",
+      "Professional Ethics & Workplace Integrity", "Stress Management & Work-Life Balance", "Decision Making Under Pressure",
+      "Networking & Relationship Building", "Creative Thinking & Innovation", "Interpersonal Skills & Active Listening"
+    ];
+
+    const defaultPrices = [250, 499, 399, 299, 349, 299, 449, 399, 499, 349, 299, 249, 199, 299, 399, 349, 299, 249];
+    const defaultImgs = [
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop"
+    ];
+
+    function generateDefaultCourses() {
+      return defaultCourseTitles.map((title, idx) => {
+        const id = idx + 1;
+        return {
+          id: id,
+          title: title,
+          price: defaultPrices[idx],
+          image: defaultImgs[idx],
+          modulesOverview: [
+            { title: `MODULE 1: FOUNDATIONS OF ${title.toUpperCase()}`, points: [`Core principles of ${title}.`, "Overcoming mental hesitation.", "Common pitfalls to avoid."] },
+            { title: `MODULE 2: STRATEGIC EXECUTION`, points: [`Frameworks to master ${title}.`, "Active listening and articulation.", "Interactive drills."] },
+            { title: `MODULE 3: REAL-WORLD CASE STUDIES`, points: ["MNC interview scenario breakdowns.", "Handling high-pressure situations."] },
+            { title: `MODULE 4: MASTERY & CERTIFICATION`, points: ["Long-term career integration.", "Final assessment unlock."] }
+          ],
+          partsList: [
+            { partTitle: `Part 1: Fundamentals`, lessons: [{ key: `${id}_1_1`, title: "Lesson 1.1: Core Concepts", duration: "10 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }] },
+            { partTitle: `Part 2: Strategic Frameworks`, lessons: [{ key: `${id}_2_1`, title: "Lesson 2.1: Practical Drills", duration: "12 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }] },
+            { partTitle: `Part 3: Corporate Scenarios`, lessons: [{ key: `${id}_3_1`, title: "Lesson 3.1: Pressure Handling", duration: "14 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }] },
+            { partTitle: `Part 4: Final Masterclass`, lessons: [{ key: `${id}_4_1`, title: "Lesson 4.1: Assessment", duration: "15 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }] }
+          ]
+        };
+      });
+    }
+
+    let globalCoursesList = [];
+    let currentEditingState = null;
+
+    function loadManagedCourses() {
+      const stored = localStorage.getItem('careergraspp_courses');
+      if (stored) {
+        try {
+          globalCoursesList = JSON.parse(stored);
+        } catch(e) {
+          globalCoursesList = generateDefaultCourses();
+        }
+      } else {
+        globalCoursesList = generateDefaultCourses();
+        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+      }
+      renderAdminCoursesGrid();
+    }
+
+    function renderAdminCoursesGrid() {
+      const container = document.getElementById('admin-courses-grid');
+      container.innerHTML = "";
+
+      globalCoursesList.forEach((course) => {
+        const modCount = course.modulesOverview ? course.modulesOverview.length : 0;
+        const partCount = course.partsList ? course.partsList.length : 0;
+
+        container.innerHTML += `
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+            <div>
+              <div class="h-44 w-full bg-slate-100 relative overflow-hidden">
+                <img src="${course.image}" alt="${course.title}" class="w-full h-full object-cover" />
+                <span class="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow">ID: #${course.id}</span>
+                <span class="absolute top-3 right-3 bg-emerald-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow">₹${course.price}</span>
+              </div>
+              <div class="p-4 space-y-2">
+                <h3 class="font-extrabold text-slate-900 text-base leading-snug">${course.title}</h3>
+                <div class="flex items-center space-x-3 text-[11px] text-slate-500">
+                  <span>📚 ${modCount} Modules</span>
+                  <span>🎥 ${partCount} Video Parts</span>
+                  <span>📄 PDF Guides</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- VISIBLE SOLID RED DELETE BUTTON -->
+            <div class="p-4 pt-0 flex items-center space-x-2">
+              <button onclick="openEditCourseModal(${course.id})" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-xs">
+                ✏️ Update Course
+              </button>
+              <button onclick="deleteCourse(${course.id})" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center space-x-1">
+                <span>🗑️ Delete</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    /* 4. DYNAMIC MODAL STATE MANAGEMENT (ADD/DELETE MODULES, PARTS, LESSONS) */
+    function openEditCourseModal(courseId) {
+      const course = globalCoursesList.find(c => c.id === courseId);
+      if (!course) return;
+
+      currentEditingState = JSON.parse(JSON.stringify(course)); // Deep Clone
+
+      document.getElementById('course-editor-title').textContent = `Update Course: ${currentEditingState.title}`;
+      document.getElementById('editor-course-id').value = currentEditingState.id;
+      document.getElementById('editor-title').value = currentEditingState.title;
+      document.getElementById('editor-price').value = currentEditingState.price;
+      document.getElementById('editor-image').value = currentEditingState.image;
+
+      renderModalModulesUI();
+      renderModalPartsUI();
+
+      document.getElementById('course-editor-modal').classList.remove('hidden');
+    }
+
+    function openCreateCourseModal() {
+      const newId = globalCoursesList.length > 0 ? Math.max(...globalCoursesList.map(c => c.id)) + 1 : 1;
+      
+      currentEditingState = {
+        id: newId,
+        title: "",
+        price: 250,
+        image: defaultImgs[0],
+        modulesOverview: [
+          { title: "MODULE 1: FOUNDATIONS", points: ["Core Overview"] },
+          { title: "MODULE 2: STRATEGIC EXECUTION", points: ["Practical Drills"] }
+        ],
+        partsList: [
+          { partTitle: "Part 1: Fundamentals", lessons: [{ key: `${newId}_1_1`, title: "Lesson 1.1: Core Concepts", duration: "10 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }] }
+        ]
+      };
+
+      document.getElementById('course-editor-title').textContent = `Create New Course (#${newId})`;
+      document.getElementById('editor-course-id').value = newId;
+      document.getElementById('editor-title').value = "";
+      document.getElementById('editor-price').value = 250;
+      document.getElementById('editor-image').value = defaultImgs[0];
+
+      renderModalModulesUI();
+      renderModalPartsUI();
+
+      document.getElementById('course-editor-modal').classList.remove('hidden');
+    }
+
+    /* --- MODULES CONTROLS --- */
+    function captureInputsToState() {
+      if (!currentEditingState) return;
+      
+      // Sync Modules
+      (currentEditingState.modulesOverview || []).forEach((mod, idx) => {
+        const titleElem = document.getElementById(`mod-title-${idx}`);
+        const ptsElem = document.getElementById(`mod-points-${idx}`);
+        if (titleElem) mod.title = titleElem.value.trim();
+        if (ptsElem) mod.points = ptsElem.value.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+      });
+
+      // Sync Parts & Lessons
+      (currentEditingState.partsList || []).forEach((part, pIdx) => {
+        const pTitleElem = document.getElementById(`part-title-${pIdx}`);
+        if (pTitleElem) part.partTitle = pTitleElem.value.trim();
+
+        (part.lessons || []).forEach((les, lIdx) => {
+          const lTitle = document.getElementById(`part-les-title-${pIdx}-${lIdx}`);
+          const lDur = document.getElementById(`part-les-dur-${pIdx}-${lIdx}`);
+          const lVid = document.getElementById(`part-les-video-${pIdx}-${lIdx}`);
+          const lPdf = document.getElementById(`part-les-pdf-${pIdx}-${lIdx}`);
+
+          if (lTitle) les.title = lTitle.value.trim();
+          if (lDur) les.duration = lDur.value.trim();
+          if (lVid) les.videoUrl = lVid.value.trim();
+          if (lPdf) les.pdfUrl = lPdf.value.trim();
+        });
+      });
+    }
+
+    function renderModalModulesUI() {
+      const container = document.getElementById('editor-modules-container');
+      container.innerHTML = "";
+
+      currentEditingState.modulesOverview.forEach((mod, idx) => {
+        const ptsText = (mod.points || []).join('\n');
+        container.innerHTML += `
+          <div class="bg-white p-3.5 rounded-xl border border-indigo-100 space-y-2 relative">
+            <div class="flex items-center justify-between">
+              <label class="font-bold text-indigo-900 text-xs uppercase">Module ${idx + 1}</label>
+              <button type="button" onclick="deleteModuleFromModal(${idx})" class="px-2 py-0.5 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded text-[10px] transition">
+                🗑️ Delete Module
+              </button>
+            </div>
+            <input type="text" id="mod-title-${idx}" value="${mod.title}" placeholder="Module Title" required class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-xs" />
+            <textarea id="mod-points-${idx}" rows="2" placeholder="Bullet Points (1 per line)" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono">${ptsText}</textarea>
+          </div>
+        `;
+      });
+    }
+
+    function addModuleToModal() {
+      captureInputsToState();
+      currentEditingState.modulesOverview.push({
+        title: `MODULE ${currentEditingState.modulesOverview.length + 1}: NEW TOPIC`,
+        points: ["Key takeaway point"]
+      });
+      renderModalModulesUI();
+    }
+
+    function deleteModuleFromModal(idx) {
+      captureInputsToState();
+      currentEditingState.modulesOverview.splice(idx, 1);
+      renderModalModulesUI();
+    }
+
+    /* --- PARTS & LESSONS CONTROLS --- */
+    function renderModalPartsUI() {
+      const container = document.getElementById('editor-parts-container');
+      container.innerHTML = "";
+
+      currentEditingState.partsList.forEach((part, pIdx) => {
+        let lessonsHtml = (part.lessons || []).map((les, lIdx) => `
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 relative">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-700 text-[11px]">Lesson ${pIdx+1}.${lIdx+1} Details</span>
+              <button type="button" onclick="deleteLessonFromModal(${pIdx}, ${lIdx})" class="px-2 py-0.5 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded text-[9px] transition">
+                🗑️ Delete Lesson
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label class="block font-semibold text-slate-600 text-[10px]">Lesson Title</label>
+                <input type="text" id="part-les-title-${pIdx}-${lIdx}" value="${les.title}" required class="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-600 text-[10px]">Duration</label>
+                <input type="text" id="part-les-dur-${pIdx}-${lIdx}" value="${les.duration || '10 mins'}" required class="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs" />
+              </div>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 text-[10px]">📹 Video Stream Link (Google Drive / MP4)</label>
+              <input type="url" id="part-les-video-${pIdx}-${lIdx}" value="${les.videoUrl}" required class="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono text-indigo-600" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 text-[10px]">📄 Session PDF Link (Google Drive / PDF)</label>
+              <input type="url" id="part-les-pdf-${pIdx}-${lIdx}" value="${les.pdfUrl}" required class="w-full px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-mono text-red-600" />
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML += `
+          <div class="bg-white p-4 rounded-xl border border-emerald-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-emerald-900 text-xs uppercase">Part ${pIdx + 1} Section</span>
+              <div class="flex items-center space-x-1.5">
+                <button type="button" onclick="addLessonToModal(${pIdx})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded text-[10px] transition">
+                  + Add Lesson
+                </button>
+                <button type="button" onclick="deletePartFromModal(${pIdx})" class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded text-[10px] transition">
+                  🗑️ Delete Part
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 text-[10px] mb-1">Part Title Header</label>
+              <input type="text" id="part-title-${pIdx}" value="${part.partTitle}" required class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-xs" />
+            </div>
+
+            <div class="space-y-2 pt-1">
+              ${lessonsHtml}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function addPartToModal() {
+      captureInputsToState();
+      const nextPartNum = currentEditingState.partsList.length + 1;
+      currentEditingState.partsList.push({
+        partTitle: `Part ${nextPartNum}: Practical Applications`,
+        lessons: [
+          { key: `${currentEditingState.id}_${nextPartNum}_1`, title: `Lesson ${nextPartNum}.1: Video Topic`, duration: "12 mins", videoUrl: defaultSampleVideo, pdfUrl: defaultSamplePdf }
+        ]
+      });
+      renderModalPartsUI();
+    }
+
+    function deletePartFromModal(pIdx) {
+      captureInputsToState();
+      currentEditingState.partsList.splice(pIdx, 1);
+      renderModalPartsUI();
+    }
+
+    function addLessonToModal(pIdx) {
+      captureInputsToState();
+      const nextLesNum = currentEditingState.partsList[pIdx].lessons.length + 1;
+      currentEditingState.partsList[pIdx].lessons.push({
+        key: `${currentEditingState.id}_${pIdx+1}_${nextLesNum}`,
+        title: `Lesson ${pIdx+1}.${nextLesNum}: New Session`,
+        duration: "10 mins",
+        videoUrl: defaultSampleVideo,
+        pdfUrl: defaultSamplePdf
+      });
+      renderModalPartsUI();
+    }
+
+    function deleteLessonFromModal(pIdx, lIdx) {
+      captureInputsToState();
+      currentEditingState.partsList[pIdx].lessons.splice(lIdx, 1);
+      renderModalPartsUI();
+    }
+
+    /* 5. SAVE COURSE TO LOCAL STORAGE AND FIRESTORE */
+    function handleSaveCourse(event) {
+      event.preventDefault();
+
+      captureInputsToState();
+
+      currentEditingState.title = document.getElementById('editor-title').value.trim();
+      currentEditingState.price = parseInt(document.getElementById('editor-price').value);
+      currentEditingState.image = document.getElementById('editor-image').value.trim();
+
+      const existingIndex = globalCoursesList.findIndex(c => c.id === currentEditingState.id);
+      if (existingIndex >= 0) {
+        globalCoursesList[existingIndex] = currentEditingState;
+      } else {
+        globalCoursesList.push(currentEditingState);
+      }
+
+      // Save to localStorage & sync with Firebase
+      localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+      db.collection('courses').doc(currentEditingState.id.toString()).set(currentEditingState, { merge: true }).catch(err => console.log(err));
+
+      alert(`✅ Course "${currentEditingState.title}" Saved & Published Successfully!`);
+      closeCourseEditorModal();
+      renderAdminCoursesGrid();
+    }
+
+    function deleteCourse(courseId) {
+      if (confirm(`Are you sure you want to delete Course #${courseId}?`)) {
+        globalCoursesList = globalCoursesList.filter(c => c.id !== courseId);
+        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+        db.collection('courses').doc(courseId.toString()).delete().catch(err => console.log(err));
+        renderAdminCoursesGrid();
+      }
+    }
+
+    function resetCoursesToDefault() {
+      if (confirm("Reset all course catalogs back to default 18 programs?")) {
+        globalCoursesList = generateDefaultCourses();
+        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+        renderAdminCoursesGrid();
+      }
+    }
+
+    function closeCourseEditorModal() {
+      document.getElementById('course-editor-modal').classList.add('hidden');
+    }
+
+    function adminLogout() {
+      localStorage.removeItem('careergraspp_role');
+      localStorage.removeItem('careergraspp_active_email');
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
