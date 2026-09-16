@@ -756,14 +756,32 @@
       window.location.href = "course.html";
     }
 
-    function executeAdminAuth(event) {
-      event.preventDefault();
-      const email = document.getElementById('login-admin-email').value.trim();
-      localStorage.setItem('careergraspp_active_email', email);
-      localStorage.setItem('careergraspp_role', 'admin');
+function executeAdminAuth(event) {
+  event.preventDefault();
+
+  const emailInput = document.getElementById('login-admin-email');
+  const keyInput = document.getElementById('login-admin-key');
+
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+  const key = keyInput ? keyInput.value.trim() : '';
+
+  const TARGET_EMAIL = "careergraspp@gmail.com";
+  const TARGET_KEY = "Kumar@2422";
+
+  if (email === TARGET_EMAIL && key === TARGET_KEY) {
+    localStorage.setItem('careergraspp_active_email', email);
+    localStorage.setItem('careergraspp_role', 'admin');
+
+    if (typeof closeUnifiedLoginModal === 'function') {
       closeUnifiedLoginModal();
-      window.location.href = "course.html";
     }
+    
+    // Redirect directly to the admin database panel
+    window.location.href = "admin-database.html";
+  } else {
+    alert(`❌ Invalid Admin Credentials!\n\nExpected:\nEmail: ${TARGET_EMAIL}\nPassword: ${TARGET_KEY}\n\nYou Entered:\nEmail: ${email}\nPassword: ${key}`);
+  }
+}
 
     function togglePartAccordion(partId) {
       const el = document.getElementById(partId);
