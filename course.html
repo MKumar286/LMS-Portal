@@ -20,93 +20,87 @@
   <!-- ================= LAYOUT CONTAINER ================= -->
   <div class="min-h-screen flex flex-col md:flex-row w-full">
 
-    <!-- ================= LEFT SIDEBAR: STUDENT PROFILE ================= -->
-    <aside class="w-full md:w-80 lg:w-96 bg-slate-900 text-white p-6 md:p-8 shrink-0 border-r border-slate-800 md:min-h-screen md:sticky md:top-0 md:h-screen flex flex-col justify-between z-30 overflow-y-auto">
+    <!-- ================= COMPACT LEFT SIDEBAR ================= -->
+    <aside class="w-full md:w-64 lg:w-72 bg-slate-900 text-white p-4 md:p-5 shrink-0 border-r border-slate-800 md:min-h-screen md:sticky md:top-0 md:h-screen flex flex-col justify-between z-30 overflow-y-auto">
       
-      <div class="space-y-8">
-        <!-- Brand Logo Header -->
-        <a href="index.html" class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-md shadow-indigo-500/20">C</div>
+      <div class="space-y-6">
+        <!-- Brand Header -->
+        <a href="index.html" class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-base shadow-md">C</div>
           <div>
-            <span class="text-xl font-extrabold tracking-tight text-white">Career<span class="text-indigo-400">graspp</span></span>
-            <span class="block text-[10px] text-slate-400 font-semibold tracking-widest uppercase -mt-1">Learning Portal</span>
+            <span class="text-base font-extrabold tracking-tight text-white">Career<span class="text-indigo-400">graspp</span></span>
+            <span class="block text-[9px] text-slate-400 font-semibold tracking-widest uppercase -mt-1">Learning Portal</span>
           </div>
         </a>
 
         <!-- Student Profile Card -->
-        <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 space-y-5 shadow-lg backdrop-blur-sm">
-          <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 border-2 border-indigo-400 flex items-center justify-center text-2xl font-black text-white shadow-md shrink-0">
+        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-4 shadow-md backdrop-blur-sm">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 border border-indigo-400 flex items-center justify-center text-xl font-black text-white shadow shrink-0">
               <span id="profile-avatar-initial">S</span>
             </div>
-            <div class="space-y-1 overflow-hidden">
-              <span id="profile-role-badge" class="inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Cloud Connected</span>
-              <h2 id="profile-student-name" class="text-lg font-extrabold text-white tracking-tight leading-tight truncate">Loading Profile...</h2>
+            <div class="space-y-0.5 overflow-hidden">
+              <span id="profile-role-badge" class="inline-block bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Cloud Connected</span>
+              <h2 id="profile-student-name" class="text-sm font-extrabold text-white tracking-tight leading-tight truncate">Loading Profile...</h2>
             </div>
           </div>
 
-          <div class="space-y-3 pt-3 border-t border-slate-700/60 text-xs text-slate-300">
-            <div class="flex items-center space-x-3">
-              <div class="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              </div>
+          <div class="space-y-2 pt-2 border-t border-slate-700/60 text-[11px] text-slate-300">
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               <span id="profile-student-email" class="truncate font-medium">Fetching email...</span>
             </div>
 
-            <div class="flex items-center space-x-3">
-              <div class="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-              </div>
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
               <span id="profile-student-phone" class="font-medium">Fetching phone...</span>
             </div>
 
-            <div class="flex items-center space-x-3">
-              <div class="w-7 h-7 rounded-lg bg-slate-700/60 flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              </div>
+            <div class="flex items-center space-x-2.5">
+              <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               <span class="text-slate-400">Joined: <span id="profile-joined-date" class="text-slate-200 font-medium">---</span></span>
             </div>
           </div>
 
-          <div class="bg-indigo-950/70 border border-indigo-800/60 rounded-xl p-4 flex items-center justify-between">
+          <div class="bg-indigo-950/70 border border-indigo-800/60 rounded-lg p-3 flex items-center justify-between">
             <div>
-              <span class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider block">My Enrolled Courses</span>
-              <span class="text-[11px] text-slate-400">Full Access Active</span>
+              <span class="text-[9px] text-indigo-300 font-bold uppercase tracking-wider block">My Enrolled Courses</span>
+              <span class="text-[10px] text-slate-400">Full Access Active</span>
             </div>
-            <span id="profile-enrolled-count" class="text-3xl font-black text-amber-400">0</span>
+            <span id="profile-enrolled-count" class="text-2xl font-black text-amber-400">0</span>
           </div>
         </div>
       </div>
 
-      <!-- Sidebar Bottom Action Buttons -->
-      <div class="pt-6 space-y-3 border-t border-slate-800 mt-6">
-        <a href="index.html#courses-section" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-2 border border-slate-700 shadow-sm">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <!-- Action Buttons -->
+      <div class="pt-4 space-y-2 border-t border-slate-800 mt-4">
+        <a href="index.html#courses-section" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-bold transition flex items-center justify-center space-x-1.5 border border-slate-700 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           <span>Browse All Courses</span>
         </a>
-        <button onclick="logoutStudent()" class="w-full py-3 bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 rounded-xl text-xs font-bold transition border border-red-500/30 flex items-center justify-center space-x-2">
-          <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <button onclick="logoutStudent()" class="w-full py-2.5 bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 rounded-lg text-[11px] font-bold transition border border-red-500/30 flex items-center justify-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           <span>Log Out</span>
         </button>
       </div>
 
     </aside>
 
-    <!-- ================= RIGHT SIDE: COURSES ROW-WISE ================= -->
-    <main class="flex-1 p-6 md:p-10 lg:p-12 min-h-screen space-y-8 overflow-y-auto">
+    <!-- ================= EXPANDED MAIN CONTENT AREA ================= -->
+    <main class="flex-1 p-4 md:p-6 lg:p-8 min-h-screen space-y-6 overflow-y-auto">
       
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-200 pb-5 gap-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-200 pb-4 gap-3">
         <div>
-          <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Enrolled Learning Modules</h1>
-          <p class="text-xs text-slate-500 mt-1">Each purchased course spans full horizontal width, arranged sequentially row by row with active 6 months validity.</p>
+          <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Enrolled Learning Modules</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Purchased courses arranged horizontally across maximum screen width with 6-month access counters.</p>
         </div>
-        <a href="index.html#courses-section" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/20">
+        <a href="index.html#courses-section" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition shadow-sm">
           + Explore More Courses
         </a>
       </div>
 
       <!-- HORIZONTAL ROW-WISE COURSES CONTAINER -->
-      <div id="student-courses-grid" class="w-full flex flex-col space-y-10">
+      <div id="student-courses-grid" class="w-full flex flex-col space-y-6">
         <!-- Injected dynamically via JS -->
       </div>
 
@@ -114,23 +108,20 @@
 
   </div>
 
-  <!-- ================= UNIFIED LOGIN MODAL (FALLBACK LOGIN) ================= -->
+  <!-- ================= UNIFIED LOGIN MODAL ================= -->
   <div id="unified-login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 md:p-8 space-y-6">
-      
       <div class="pb-2 border-b border-slate-100">
         <h3 class="font-extrabold text-xl text-slate-900">Careergraspp Login</h3>
         <p class="text-xs text-slate-500">Select your role to access your account</p>
       </div>
 
-      <!-- ROLE TAB SWITCHER -->
       <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1.5 rounded-xl text-xs font-bold text-center">
         <button id="tab-btn-student" onclick="switchLoginRoleTab('student')" class="py-2.5 rounded-lg bg-white text-indigo-600 shadow-sm transition">🎓 Student</button>
         <button id="tab-btn-org" onclick="switchLoginRoleTab('org')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🏢 Org</button>
         <button id="tab-btn-admin" onclick="switchLoginRoleTab('admin')" class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition">⚙️ Admin</button>
       </div>
 
-      <!-- STUDENT FORM -->
       <form id="form-role-student" onsubmit="executeStudentAuth(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Registered Email Address</label>
@@ -145,7 +136,6 @@
         </button>
       </form>
 
-      <!-- ORGANIZATION FORM -->
       <form id="form-role-org" onsubmit="executeOrgAuth(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Organization Email / ID</label>
@@ -160,7 +150,6 @@
         </button>
       </form>
 
-      <!-- ADMIN FORM -->
       <form id="form-role-admin" onsubmit="executeAdminAuth(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Administrator Email</label>
@@ -174,7 +163,6 @@
           Sign In as Admin →
         </button>
       </form>
-
     </div>
   </div>
 
@@ -218,7 +206,6 @@
     let activeStudentProfile = null;
     let currentPlayingLessonKey = null;
 
-    // 6 MONTHS VALIDITY IN MILLISECONDS (180 DAYS)
     const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
 
     const samplePdfLinks = [
@@ -275,31 +262,31 @@
           {
             title: `MODULE 1: FOUNDATIONS OF ${title.toUpperCase()}`,
             points: [
-              `Understanding core principles and psychological fundamentals of ${title}.`,
-              "Overcoming mental hesitation and building baseline confidence.",
-              "Identifying common pitfalls faced by entry-level candidates."
+              `Core principles and psychological fundamentals of ${title}.`,
+              "Overcoming hesitation & building baseline confidence.",
+              "Common pitfalls faced by entry-level candidates."
             ]
           },
           {
             title: `MODULE 2: STRATEGIC EXECUTION & DRILLS`,
             points: [
-              `Step-by-step framework to master ${title} in fast-paced environments.`,
-              "Active listening, clear articulation, and situational adaptation.",
-              "Interactive drills for campus placement interviews."
+              `Frameworks to master ${title} in corporate setups.`,
+              "Active listening & situational adaptation.",
+              "Interactive placement interview drills."
             ]
           },
           {
-            title: `MODULE 3: REAL-WORLD CASE STUDIES & SCENARIOS`,
+            title: `MODULE 3: REAL-WORLD CASE STUDIES`,
             points: [
-              "Detailed breakdown of actual MNC and campus recruitment scenarios.",
-              "Handling high-pressure situations, difficult managers, and tricky questions."
+              "Breakdown of MNC and campus recruitment scenarios.",
+              "Handling high-pressure situations & tricky questions."
             ]
           },
           {
             title: `MODULE 4: MASTERY & CERTIFICATION`,
             points: [
-              "Synthesizing all tools for long-term career growth.",
-              "Final comprehensive assessment and verified certificate unlocks."
+              "Synthesizing tools for long-term career growth.",
+              "Final assessment & certificate unlock."
             ]
           }
         ],
@@ -330,16 +317,16 @@
           }
         ],
         keyTakeaways: [
-          `Master fundamental pillars of ${title} for campus placement success.`,
-          "Learn step-by-step techniques to eliminate hesitation and speak with authority.",
-          "Understand how hiring managers evaluate non-verbal cues and body language.",
-          "Gain practical frameworks to analyze complex workplace scenarios rapidly.",
-          "Structure professional responses using proven industry frameworks like STAR.",
+          `Master fundamental pillars of ${title} for campus placement.`,
+          "Learn techniques to eliminate hesitation and speak with authority.",
+          "Understand non-verbal cues and body language evaluation.",
+          "Gain practical frameworks to analyze complex workplace scenarios.",
+          "Structure professional responses using proven frameworks like STAR.",
           "Develop strong interpersonal adaptability across cross-functional teams.",
-          "Learn to manage high-pressure situations and turn conflicts into solutions.",
+          "Manage high-pressure situations and turn conflicts into solutions.",
           "Build executive presence suitable for corporate client interactions.",
-          "Utilize downloadable session PDF guides to practice offline before interviews.",
-          "Receive verified completion certificate to highlight on resume and LinkedIn."
+          "Utilize downloadable session PDF guides to practice offline.",
+          "Receive verified completion certificate for LinkedIn & resume."
         ]
       };
     });
@@ -360,7 +347,6 @@
       }
     });
 
-    /* CREDENTIAL VERIFICATION FROM FIRESTORE */
     async function verifyAndFetchStudent(email, phone, unlockedId) {
       try {
         const docRef = db.collection('students').doc(email.toLowerCase());
@@ -416,7 +402,7 @@
       };
 
       document.getElementById('profile-role-badge').textContent = role.toUpperCase() + " ACTIVE";
-      document.getElementById('profile-role-badge').className = "inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider";
+      document.getElementById('profile-role-badge').className = "inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider";
       document.getElementById('unified-login-modal').classList.add('hidden');
       loadDashboardUI(activeStudentProfile);
     }
@@ -432,7 +418,7 @@
       renderDashboardGrid(profile);
     }
 
-    /* RENDER COURSES (ROW-WISE HORIZONTAL LAYOUT) */
+    /* RENDER HIGH-DENSITY CLEAN COURSE CARDS */
     function renderDashboardGrid(profile) {
       const container = document.getElementById('student-courses-grid');
       container.innerHTML = "";
@@ -447,7 +433,6 @@
       }
 
       paidCourses.forEach(course => {
-        // Calculate 6 Months Validity & Days Remaining
         const enrollmentTime = (profile.courseEnrollmentDates && profile.courseEnrollmentDates[course.id])
           ? profile.courseEnrollmentDates[course.id]
           : (profile.joinedTimestamp || Date.now());
@@ -458,36 +443,36 @@
         const isExpired = daysLeft <= 0;
 
         let validityBadgeHtml = isExpired 
-          ? `<span class="bg-red-100 text-red-700 border border-red-300 px-3 py-1 rounded-full text-xs font-black">⚠️ Course Validity Expired</span>`
-          : `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1 rounded-full text-xs font-black">⏳ ${daysLeft} Days Left (6 Months Access)</span>`;
+          ? `<span class="bg-red-100 text-red-700 border border-red-300 px-2.5 py-0.5 rounded-full text-[10px] font-black">⚠️ Access Expired</span>`
+          : `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-black">⏳ ${daysLeft} Days Left</span>`;
 
         let modulesHtml = (course.modulesOverview || []).map(mod => `
-          <div class="bg-indigo-50/70 border-l-4 border-indigo-600 p-3 rounded-r-xl space-y-1">
-            <p class="font-extrabold text-xs text-slate-900 uppercase tracking-wide">${mod.title}</p>
-            <ul class="space-y-1 pl-1">
-              ${mod.points.map(pt => `<li class="text-xs text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1.5">•</span><span>${pt}</span></li>`).join('')}
+          <div class="bg-indigo-50/70 border-l-2 border-indigo-600 p-2.5 rounded-r-lg space-y-1">
+            <p class="font-bold text-[10px] text-slate-900 uppercase tracking-wide">${mod.title}</p>
+            <ul class="space-y-0.5 pl-1">
+              ${mod.points.map(pt => `<li class="text-[10px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1">•</span><span>${pt}</span></li>`).join('')}
             </ul>
           </div>
         `).join('');
 
         let partsHtml = (course.partsList || []).map((part) => `
-          <div class="space-y-2">
-            <p class="font-extrabold text-xs text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${part.partTitle}</p>
-            <div class="space-y-1.5">
+          <div class="space-y-1">
+            <p class="font-bold text-[10px] text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">${part.partTitle}</p>
+            <div class="space-y-1">
               ${part.lessons.map(les => {
                 const isCompleted = completedSet.has(les.key);
                 return `
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center space-x-2 truncate">
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-1.5 text-[10px]">
+                    <div class="flex items-center space-x-1.5 truncate">
                       ${isCompleted 
-                        ? `<span class="bg-emerald-100 text-emerald-700 border border-emerald-300 font-extrabold text-[10px] px-2 py-0.5 rounded-md flex-shrink-0">✓ Completed</span>` 
-                        : `<span class="bg-slate-200 text-slate-600 font-bold text-[10px] px-2 py-0.5 rounded-md flex-shrink-0">Pending</span>`
+                        ? `<span class="bg-emerald-100 text-emerald-700 border border-emerald-300 font-extrabold text-[9px] px-1.5 py-0.5 rounded flex-shrink-0">✓ Completed</span>` 
+                        : `<span class="bg-slate-200 text-slate-600 font-bold text-[9px] px-1.5 py-0.5 rounded flex-shrink-0">Pending</span>`
                       }
                       <span class="font-semibold text-slate-800 truncate">${les.title}</span>
                     </div>
-                    <div class="flex items-center space-x-2 flex-shrink-0">
-                      <button onclick="handleLessonAccess(${isExpired}, '${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded-lg transition text-xs shadow-sm">▶ Play</button>
-                      <a href="${isExpired ? '#' : les.pdfUrl}" onclick="${isExpired ? `handleExpiredNotice(); return false;` : ''}" target="${isExpired ? '_self' : '_blank'}" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-xs">📄 PDF</a>
+                    <div class="flex items-center space-x-1 flex-shrink-0">
+                      <button onclick="handleLessonAccess(${isExpired}, '${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-2.5 py-1 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded transition text-[10px]">▶ Play</button>
+                      <a href="${isExpired ? '#' : les.pdfUrl}" onclick="${isExpired ? `handleExpiredNotice(); return false;` : ''}" target="${isExpired ? '_self' : '_blank'}" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded transition text-[10px]">📄 PDF</a>
                     </div>
                   </div>
                 `;
@@ -497,52 +482,52 @@
         `).join('');
 
         let takeawaysHtml = (course.keyTakeaways || []).map((pt, kIdx) => `
-          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start space-x-2 text-xs">
-            <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
-            <span class="text-slate-700 font-medium">${pt}</span>
+          <div class="p-1.5 bg-slate-50 border border-slate-200 rounded-lg flex items-start space-x-1.5 text-[10px]">
+            <span class="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${kIdx + 1}</span>
+            <span class="text-slate-700 font-medium leading-tight">${pt}</span>
           </div>
         `).join('');
 
-        // HORIZONTAL ROW CARD
+        // ULTRA-CLEAN HIGH-DENSITY ROW CARD
         container.innerHTML += `
-          <div class="bg-white border ${isExpired ? 'border-red-300' : 'border-indigo-200'} rounded-3xl overflow-hidden shadow-lg w-full flex flex-col space-y-6 p-6 md:p-8">
+          <div class="bg-white border ${isExpired ? 'border-red-300' : 'border-slate-200'} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition w-full flex flex-col space-y-4 p-4 md:p-6">
             
-            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-slate-200">
-              <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 w-full lg:w-auto">
-                <img src="${course.image}" alt="${course.title}" class="w-full sm:w-56 h-36 object-cover rounded-2xl border border-slate-200 shadow-sm shrink-0" />
-                <div class="space-y-2">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="bg-emerald-600 text-white text-[11px] px-3 py-1 rounded-full font-extrabold">✓ UNLOCKED & ACTIVE</span>
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+              <div class="flex items-center space-x-4">
+                <img src="${course.image}" alt="${course.title}" class="w-32 h-20 object-cover rounded-xl border border-slate-200 shadow-sm shrink-0" />
+                <div class="space-y-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="bg-emerald-600 text-white text-[9px] px-2 py-0.5 rounded-full font-extrabold">✓ UNLOCKED</span>
                     ${validityBadgeHtml}
                   </div>
-                  <h3 class="text-2xl font-black text-slate-900">${course.title}</h3>
-                  <p class="text-xs text-slate-500">6 Months Unlimited Video Streaming • HD Video Modules • Downloadable Session PDFs</p>
+                  <h3 class="text-lg font-black text-slate-900">${course.title}</h3>
+                  <p class="text-[11px] text-slate-500">6 Months Access • 4 HD Video Modules • PDF Study Support</p>
                 </div>
               </div>
 
               ${isExpired ? `
-                <button onclick="handleExpiredNotice()" class="w-full lg:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition shadow-md">
+                <button onclick="handleExpiredNotice()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
                   Renew Access Now
                 </button>
               ` : ''}
             </div>
 
-            <!-- 3-COLUMN CONTENT GRID (MODULES, LESSONS, TAKEAWAYS) -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 3-COLUMN COMPACT CONTENT GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 text-[11px]">
               
-              <div class="space-y-3">
-                <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Course Modules Breakdown</h4>
-                <div class="space-y-3">${modulesHtml}</div>
+              <div class="space-y-2">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Course Modules</h4>
+                <div class="space-y-2">${modulesHtml}</div>
               </div>
 
-              <div class="space-y-3">
-                <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Video Parts & PDF Guides</h4>
-                <div class="space-y-3">${partsHtml}</div>
+              <div class="space-y-2">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Video Lessons & PDFs</h4>
+                <div class="space-y-2">${partsHtml}</div>
               </div>
 
-              <div class="space-y-3">
-                <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider">Key Learning Outcomes</h4>
-                <div class="grid grid-cols-1 gap-2">${takeawaysHtml}</div>
+              <div class="space-y-2">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Key Takeaways</h4>
+                <div class="grid grid-cols-1 gap-1.5">${takeawaysHtml}</div>
               </div>
 
             </div>
@@ -555,16 +540,15 @@
     function renderEmptyState(message) {
       const container = document.getElementById('student-courses-grid');
       container.innerHTML = `
-        <div class="col-span-full text-center py-16 bg-white border border-slate-200 rounded-3xl p-8 space-y-4 shadow-sm w-full">
-          <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold">📚</div>
-          <h3 class="text-xl font-bold text-slate-900">No Enrolled Courses Found</h3>
+        <div class="col-span-full text-center py-12 bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm w-full">
+          <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto text-xl font-bold">📚</div>
+          <h3 class="text-lg font-bold text-slate-900">No Enrolled Courses Found</h3>
           <p class="text-xs text-slate-500 max-w-sm mx-auto">${message}</p>
-          <a href="index.html#courses-section" class="inline-block px-6 py-3 bg-indigo-600 text-white font-bold text-xs rounded-xl transition">Browse All Courses →</a>
+          <a href="index.html#courses-section" class="inline-block px-5 py-2.5 bg-indigo-600 text-white font-bold text-xs rounded-lg transition">Browse All Courses →</a>
         </div>
       `;
     }
 
-    /* AUTOMATIC LOGOUT & EXPIRED COURSE NOTICE */
     function handleLessonAccess(isExpired, key, title, videoUrl, pdfUrl) {
       if (isExpired) {
         handleExpiredNotice();
@@ -585,7 +569,6 @@
       window.location.href = "index.html#courses-section";
     }
 
-    /* MULTI-ROLE FALLBACK LOGIN FUNCTIONALITY */
     function switchLoginRoleTab(role) {
       const studentTab = document.getElementById('tab-btn-student');
       const orgTab = document.getElementById('tab-btn-org');
