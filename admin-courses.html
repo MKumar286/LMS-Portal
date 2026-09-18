@@ -9,6 +9,7 @@
 
   <!-- FIREBASE SDKs (v9 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -43,7 +44,7 @@
             </div>
             <div class="overflow-hidden">
               <span class="block text-[8px] font-bold text-emerald-400 uppercase tracking-wider">Super Admin</span>
-              <p class="text-[11px] font-bold text-white truncate">use-careergraspp@gmail.com</p>
+              <p id="admin-user-email-display" class="text-[11px] font-bold text-white truncate">use-careergraspp@gmail.com</p>
             </div>
           </div>
         </div>
@@ -222,27 +223,32 @@
     }
     const db = firebase.firestore();
 
-    /* 2. ADMIN AUTHENTICATION GUARD */
+    /* 2. AUTHENTICATION OBSERVER GUARD */
     document.addEventListener('DOMContentLoaded', function() {
-      const role = localStorage.getItem('careergraspp_role');
-      const email = localStorage.getItem('careergraspp_active_email');
+      firebase.auth().onAuthStateChanged((user) => {
+        const role = localStorage.getItem('careergraspp_role');
+        const email = user ? user.email : localStorage.getItem('careergraspp_active_email');
 
-      if (role !== 'admin' || email !== 'use-careergraspp@gmail.com') {
-        const inputPass = prompt("🔐 Admin Authentication Required\nPlease enter the Admin Master Password:");
-        if (inputPass === 'Kumar@2422') {
-          localStorage.setItem('careergraspp_role', 'admin');
-          localStorage.setItem('careergraspp_active_email', 'use-careergraspp@gmail.com');
+        if ((role === 'admin' || user) && (email === 'use-careergraspp@gmail.com' || email === 'careergraspp@gmail.com')) {
+          if (document.getElementById('admin-user-email-display')) {
+            document.getElementById('admin-user-email-display').textContent = email;
+          }
           loadManagedCourses();
         } else {
-          alert("❌ Unauthorized Admin Access!");
-          window.location.href = "index.html";
+          const inputPass = prompt("🔐 Admin Authentication Required\nPlease enter the Master Access Password:");
+          if (inputPass === 'Kumar@2422') {
+            localStorage.setItem('careergraspp_role', 'admin');
+            localStorage.setItem('careergraspp_active_email', 'use-careergraspp@gmail.com');
+            loadManagedCourses();
+          } else {
+            alert("❌ Unauthorized Admin Access!");
+            window.location.href = "index.html";
+          }
         }
-      } else {
-        loadManagedCourses();
-      }
+      });
     });
 
-    /* 3. DEFAULT COURSES CATALOG SEED */
+    /* 3. DEFAULT COURSES SEED */
     const defaultSampleVideo = "https://drive.google.com/file/d/1SwWrTypvpt8lIwWJgDcMFo-ax7t0arQg/view?usp=sharing";
     const defaultSamplePdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
@@ -304,19 +310,32 @@
     let globalCoursesList = [];
     let currentEditingState = null;
 
+    /* 4. FETCH COURSES FROM FIRESTORE DATABASE */
     function loadManagedCourses() {
-      const stored = localStorage.getItem('careergraspp_courses');
-      if (stored) {
-        try {
-          globalCoursesList = JSON.parse(stored);
-        } catch(e) {
-          globalCoursesList = generateDefaultCourses();
+      db.collection('courses').orderBy('id', 'asc').onSnapshot((snapshot) => {
+        if (!snapshot.empty) {
+          globalCoursesList = [];
+          snapshot.forEach((doc) => {
+            globalCoursesList.push(doc.data());
+          });
+          localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+          renderAdminCoursesGrid();
+        } else {
+          // Seed defaults if database is empty
+          const defaults = generateDefaultCourses();
+          defaults.forEach(c => {
+            db.collection('courses').doc(c.id.toString()).set(c);
+          });
+          globalCoursesList = defaults;
+          localStorage.setItem('careergraspp_courses', JSON.stringify(defaults));
+          renderAdminCoursesGrid();
         }
-      } else {
-        globalCoursesList = generateDefaultCourses();
-        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
-      }
-      renderAdminCoursesGrid();
+      }, (err) => {
+        console.error("Firestore Read Error:", err);
+        const stored = localStorage.getItem('careergraspp_courses');
+        if (stored) globalCoursesList = JSON.parse(stored);
+        renderAdminCoursesGrid();
+      });
     }
 
     function renderAdminCoursesGrid() {
@@ -359,12 +378,12 @@
       });
     }
 
-    /* 4. DYNAMIC MODAL STATE MANAGEMENT (ADD/DELETE MODULES, PARTS, LESSONS) */
+    /* 5. MODAL STATE MANAGEMENT */
     function openEditCourseModal(courseId) {
       const course = globalCoursesList.find(c => c.id === courseId);
       if (!course) return;
 
-      currentEditingState = JSON.parse(JSON.stringify(course)); // Deep Clone
+      currentEditingState = JSON.parse(JSON.stringify(course));
 
       document.getElementById('course-editor-title').textContent = `Update Course: ${currentEditingState.title}`;
       document.getElementById('editor-course-id').value = currentEditingState.id;
@@ -407,11 +426,9 @@
       document.getElementById('course-editor-modal').classList.remove('hidden');
     }
 
-    /* --- MODULES CONTROLS --- */
     function captureInputsToState() {
       if (!currentEditingState) return;
       
-      // Sync Modules
       (currentEditingState.modulesOverview || []).forEach((mod, idx) => {
         const titleElem = document.getElementById(`mod-title-${idx}`);
         const ptsElem = document.getElementById(`mod-points-${idx}`);
@@ -419,7 +436,6 @@
         if (ptsElem) mod.points = ptsElem.value.split('\n').map(p => p.trim()).filter(p => p.length > 0);
       });
 
-      // Sync Parts & Lessons
       (currentEditingState.partsList || []).forEach((part, pIdx) => {
         const pTitleElem = document.getElementById(`part-title-${pIdx}`);
         if (pTitleElem) part.partTitle = pTitleElem.value.trim();
@@ -474,7 +490,6 @@
       renderModalModulesUI();
     }
 
-    /* --- PARTS & LESSONS CONTROLS --- */
     function renderModalPartsUI() {
       const container = document.getElementById('editor-parts-container');
       container.innerHTML = "";
@@ -573,8 +588,8 @@
       renderModalPartsUI();
     }
 
-    /* 5. SAVE COURSE TO LOCAL STORAGE AND FIRESTORE */
-    function handleSaveCourse(event) {
+    /* 6. SAVE & PUBLISH TO FIRESTORE CLOUD DATABASE */
+    async function handleSaveCourse(event) {
       event.preventDefault();
 
       captureInputsToState();
@@ -583,35 +598,47 @@
       currentEditingState.price = parseInt(document.getElementById('editor-price').value);
       currentEditingState.image = document.getElementById('editor-image').value.trim();
 
-      const existingIndex = globalCoursesList.findIndex(c => c.id === currentEditingState.id);
-      if (existingIndex >= 0) {
-        globalCoursesList[existingIndex] = currentEditingState;
-      } else {
-        globalCoursesList.push(currentEditingState);
+      try {
+        // Save to Firebase Cloud Firestore
+        await db.collection('courses').doc(currentEditingState.id.toString()).set(currentEditingState, { merge: true });
+
+        // Backup to local storage
+        const existingIndex = globalCoursesList.findIndex(c => c.id === currentEditingState.id);
+        if (existingIndex >= 0) {
+          globalCoursesList[existingIndex] = currentEditingState;
+        } else {
+          globalCoursesList.push(currentEditingState);
+        }
+        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+
+        alert(`✅ Course "${currentEditingState.title}" Published Live to Cloud & Website!`);
+        closeCourseEditorModal();
+      } catch (err) {
+        alert("Firestore Write Error: " + err.message);
       }
-
-      // Save to localStorage & sync with Firebase
-      localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
-      db.collection('courses').doc(currentEditingState.id.toString()).set(currentEditingState, { merge: true }).catch(err => console.log(err));
-
-      alert(`✅ Course "${currentEditingState.title}" Saved & Published Successfully!`);
-      closeCourseEditorModal();
-      renderAdminCoursesGrid();
     }
 
-    function deleteCourse(courseId) {
+    async function deleteCourse(courseId) {
       if (confirm(`Are you sure you want to delete Course #${courseId}?`)) {
-        globalCoursesList = globalCoursesList.filter(c => c.id !== courseId);
-        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
-        db.collection('courses').doc(courseId.toString()).delete().catch(err => console.log(err));
-        renderAdminCoursesGrid();
+        try {
+          await db.collection('courses').doc(courseId.toString()).delete();
+          globalCoursesList = globalCoursesList.filter(c => c.id !== courseId);
+          localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+          renderAdminCoursesGrid();
+        } catch (err) {
+          alert("Firestore Delete Error: " + err.message);
+        }
       }
     }
 
     function resetCoursesToDefault() {
-      if (confirm("Reset all course catalogs back to default 18 programs?")) {
-        globalCoursesList = generateDefaultCourses();
-        localStorage.setItem('careergraspp_courses', JSON.stringify(globalCoursesList));
+      if (confirm("Reset catalog back to default 18 programs in Firestore?")) {
+        const defaults = generateDefaultCourses();
+        defaults.forEach(c => {
+          db.collection('courses').doc(c.id.toString()).set(c);
+        });
+        globalCoursesList = defaults;
+        localStorage.setItem('careergraspp_courses', JSON.stringify(defaults));
         renderAdminCoursesGrid();
       }
     }
@@ -621,9 +648,11 @@
     }
 
     function adminLogout() {
-      localStorage.removeItem('careergraspp_role');
-      localStorage.removeItem('careergraspp_active_email');
-      window.location.href = "index.html";
+      firebase.auth().signOut().then(() => {
+        localStorage.removeItem('careergraspp_role');
+        localStorage.removeItem('careergraspp_active_email');
+        window.location.href = "index.html";
+      });
     }
   </script>
 </body>
