@@ -3,290 +3,177 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Control Panel - Careergraspp</title>
+  <title>Super Admin Database & Analytics - Careergraspp</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- FIREBASE SDKs (v9 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
     body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen selection:bg-indigo-600 selection:text-white">
+<body class="bg-slate-100 text-slate-800 min-h-screen">
 
-  <!-- ================= MAIN LAYOUT CONTAINER ================= -->
-  <div class="min-h-screen flex flex-col md:flex-row w-full">
-
-    <!-- ================= ADMIN LEFT SIDEBAR ================= -->
-    <aside class="w-full md:w-56 lg:w-64 bg-slate-900 text-white p-3.5 md:p-4 shrink-0 border-r border-slate-800 md:min-h-screen md:sticky md:top-0 md:h-screen flex flex-col justify-between z-30 overflow-y-auto">
-      
-      <div class="space-y-5">
-        <!-- Brand Header -->
-        <a href="admin-database.html" class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-md">
-            ⚙️
-          </div>
-          <div>
-            <span class="text-sm font-extrabold tracking-tight text-white">Career<span class="text-indigo-400">graspp</span></span>
-            <span class="block text-[8px] text-amber-400 font-bold tracking-widest uppercase -mt-0.5">Admin Control Center</span>
-          </div>
+  <!-- ================= TOP NAVIGATION HEADER ================= -->
+  <header class="bg-slate-900 text-white p-4 shadow-lg sticky top-0 z-40 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center font-black text-slate-950 text-lg shadow">⚙️</div>
+        <div>
+          <h1 class="font-extrabold text-base leading-none tracking-tight">Super Admin Database</h1>
+          <span class="text-[10px] text-amber-400 font-bold tracking-widest uppercase">Master Revenue & Roster Console</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <a href="admin-courses.html" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
+          📚 Manage Courses
         </a>
-
-        <!-- Admin Info Card -->
-        <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 space-y-1 shadow-sm">
-          <div class="flex items-center space-x-2">
-            <div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs font-bold">
-              👑
-            </div>
-            <div class="overflow-hidden">
-              <span class="block text-[8px] font-bold text-emerald-400 uppercase tracking-wider">Super Admin</span>
-              <p class="text-[11px] font-bold text-white truncate">use-careergraspp@gmail.com</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- SIDEBAR NAVIGATION MENU -->
-        <!-- SIDEBAR NAVIGATION MENU (SEPARATE PAGE NAVIGATION) -->
-        <nav class="space-y-1 pt-1">
-          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 mb-1.5">Management Portal</p>
-          
-          <!-- 1. Individual Students (ACTIVE PAGE) -->
-          <a href="admin-database.html" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm">
-            <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            <span>Individual Students</span>
-          </a>
-
-          <!-- 2. Manage Organization -->
-          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
-            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0V7m4 4V7m0 4h4m-4-4h4"/></svg>
-            <span>Manage Organization</span>
-          </a>
-
-          <!-- 3. Manage Courses (OPENS NEW PAGE admin-courses.html) -->
-          <a href="admin-courses.html" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
-            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            <span>Manage Courses</span>
-          </a>
-
-          <!-- 4. Tests -->
-          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
-            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span>Tests</span>
-          </a>
-
-          <!-- 5. Quizzes -->
-          <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white">
-            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Quizzes</span>
-          </a>
-        </nav>
-      </div>
-
-      <!-- Action Footer -->
-      <div class="pt-3 border-t border-slate-800 space-y-1.5 mt-3">
-        <a href="index.html" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px] font-bold transition flex items-center justify-center space-x-1 border border-slate-700">
-          <span>🌐 View Website</span>
-        </a>
-        <button onclick="adminLogout()" class="w-full py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-400 rounded-lg text-[11px] font-bold transition border border-red-500/30 flex items-center justify-center space-x-1">
-          <span>🚪 Admin Logout</span>
+        <button onclick="adminLogout()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
+          Log Out
         </button>
       </div>
+    </div>
+  </header>
 
-    </aside>
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6">
 
-    <!-- ================= MAIN CONTENT AREA ================= -->
-    <main class="flex-1 p-3 md:p-5 lg:p-6 min-h-screen space-y-4 overflow-hidden flex flex-col">
+    <!-- METRICS OVERVIEW CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Gross Revenue</span>
+        <h3 id="stat-total-revenue" class="text-3xl font-black text-emerald-600">₹0</h3>
+        <span class="text-[10px] text-slate-400">Summed from all Razorpay transactions</span>
+      </div>
 
-      <!-- ================= SECTION 1: INDIVIDUAL STUDENTS DATABASE ================= -->
-      <div id="section-students" class="space-y-4 flex-1 flex flex-col min-h-0">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Registered Students</span>
+        <h3 id="stat-total-students" class="text-3xl font-black text-slate-900">0</h3>
+        <span class="text-[10px] text-slate-400">Active accounts across all colleges</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Course Enrollments</span>
+        <h3 id="stat-total-enrollments" class="text-3xl font-black text-indigo-600">0</h3>
+        <span class="text-[10px] text-slate-400">Unlocked course licenses</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Institutional Partners</span>
+        <h3 id="stat-total-orgs" class="text-3xl font-black text-amber-500">0</h3>
+        <span class="text-[10px] text-slate-400">Registered campus org codes</span>
+      </div>
+    </div>
+
+    <!-- TABS AND SEARCH FILTER BAR -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
-        <!-- TOP METRICS CARDS -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between">
-            <div>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Registered Students</p>
-              <h3 id="stat-total-students" class="text-xl font-black text-slate-900 mt-0.5">0</h3>
-            </div>
-            <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold">👥</div>
-          </div>
-
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between">
-            <div>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Courses Sold</p>
-              <h3 id="stat-total-purchases" class="text-xl font-black text-emerald-600 mt-0.5">0</h3>
-            </div>
-            <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-sm font-bold">📚</div>
-          </div>
-
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between">
-            <div>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Avg Courses / Student</p>
-              <h3 id="stat-avg-courses" class="text-xl font-black text-amber-500 mt-0.5">0</h3>
-            </div>
-            <div class="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-sm font-bold">📊</div>
-          </div>
-
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between">
-            <div>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Firestore Connection</p>
-              <h3 class="text-[11px] font-black text-emerald-600 mt-0.5 flex items-center">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-1"></span> Live Sync
-              </h3>
-            </div>
-            <div class="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-sm font-bold">🔥</div>
-          </div>
+        <!-- View Toggle Buttons -->
+        <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold w-full md:w-auto">
+          <button id="tab-btn-students" onclick="switchViewTab('students')" class="px-5 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition">
+            🎓 Student Profiles
+          </button>
+          <button id="tab-btn-transactions" onclick="switchViewTab('transactions')" class="px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
+            💳 Transaction Logs
+          </button>
         </div>
 
-        <!-- TABLE CONTROLS & DATABASE DISPLAY CONTAINER -->
-        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex-1 flex flex-col min-h-0 space-y-3">
+        <!-- Search & Filter Controls -->
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+          <input type="text" id="global-search-input" onkeyup="applyFilters()" placeholder="Search Name, Email, Phone, Org Code..." class="w-full sm:w-72 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
           
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 shrink-0">
-            <div>
-              <h2 class="text-base font-black text-slate-900 tracking-tight">Individual Student Records</h2>
-              <p class="text-[11px] text-slate-500">Compact view of student data, enrolled courses, and direct profile launcher.</p>
-            </div>
-
-            <div class="flex items-center space-x-2">
-              <div class="relative flex-1 sm:w-56">
-                <input type="text" id="search-input" onkeyup="filterDatabaseTable()" placeholder="Search name, email, course..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
-                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              </div>
-
-              <button onclick="loadStudentDatabase()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[11px] transition border border-slate-200 shrink-0">
-                🔄 Refresh
-              </button>
-              
-              <button onclick="exportToCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-lg text-[11px] transition shadow-xs shrink-0">
-                📥 Export CSV
-              </button>
-            </div>
-          </div>
-
-          <!-- NO-SCROLL COMPACT TABLE CONTAINER -->
-          <div class="flex-1 overflow-y-auto rounded-lg border border-slate-200">
-            <table class="w-full text-left border-collapse table-fixed">
-              <thead class="bg-slate-100 text-slate-900 font-extrabold uppercase border-b border-slate-200 text-[9px] tracking-wider sticky top-0 z-10">
-                <tr>
-                  <th class="p-2 w-8 text-center">#</th>
-                  <th class="p-2 w-1/4">Student Details</th>
-                  <th class="p-2 w-28">Contact Number</th>
-                  <th class="p-2 w-20 text-center">Courses</th>
-                  <th class="p-2">Enrolled Course IDs & Titles</th>
-                  <th class="p-2 w-24">Joined Date</th>
-                  <th class="p-2 w-24 text-center">Student Profile</th>
-                </tr>
-              </thead>
-              <tbody id="student-table-body" class="divide-y divide-slate-100 bg-white text-[11px]">
-                <tr>
-                  <td colspan="7" class="p-6 text-center text-slate-400 font-medium">Fetching student database from Firebase...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
+          <select id="filter-org-code" onchange="applyFilters()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-600">
+            <option value="ALL">All Organizations</option>
+            <option value="INDIVIDUAL">Individual Signups</option>
+            <!-- Dynamic Org options injected here -->
+          </select>
         </div>
 
       </div>
+    </div>
 
-      <!-- ================= OTHER PLACEHOLDER TAB SECTIONS ================= -->
-      <div id="section-org" class="hidden bg-white border border-slate-200 rounded-xl p-6 space-y-2 text-center shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900">🏢 Manage Organizations</h3>
-        <p class="text-xs text-slate-500 max-w-md mx-auto">Institutional campus partnerships and bulk college onboarding settings.</p>
+    <!-- ================= VIEW 1: STUDENT ROSTER TABLE ================= -->
+    <div id="view-students-container" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h2 class="text-base font-extrabold text-slate-900">Registered Student Profiles</h2>
+        <span id="student-count-badge" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-3 py-1 rounded-full border border-indigo-200">Showing 0 Records</span>
       </div>
 
-      <div id="section-courses" class="hidden bg-white border border-slate-200 rounded-xl p-6 space-y-2 text-center shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900">📚 Manage Courses</h3>
-        <p class="text-xs text-slate-500 max-w-md mx-auto">Upload new course content, edit prices, and modify Google Drive stream links.</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px]">
+              <th class="p-3">Student Details</th>
+              <th class="p-3">College / Org Code</th>
+              <th class="p-3">Type</th>
+              <th class="p-3">Enrolled Courses</th>
+              <th class="p-3">Joined Date</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="student-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="p-6 text-center text-slate-400">Loading master student database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 2: PAYMENT TRANSACTION LOGS TABLE ================= -->
+    <div id="view-transactions-container" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 hidden">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h2 class="text-base font-extrabold text-slate-900">Razorpay Payment Transaction Logs</h2>
+        <span id="transaction-count-badge" class="text-xs bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full border border-emerald-200">0 Transactions Found</span>
       </div>
 
-      <div id="section-tests" class="hidden bg-white border border-slate-200 rounded-xl p-6 space-y-2 text-center shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900">📝 Manage Tests</h3>
-        <p class="text-xs text-slate-500 max-w-md mx-auto">Create and assign placement practice mock examinations.</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px]">
+              <th class="p-3">Payment ID (Razorpay)</th>
+              <th class="p-3">Student Email</th>
+              <th class="p-3">Course Purchased</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Date & Time</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="p-6 text-center text-slate-400">Loading payment transaction logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= STUDENT DETAIL MODAL ================= -->
+  <div id="student-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-6">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+        <h3 class="font-extrabold text-base text-slate-900">Student Profile Inspector</h3>
+        <button onclick="closeStudentDetailModal()" class="text-slate-400 hover:text-slate-800 font-bold text-xl px-2">&times;</button>
       </div>
 
-      <div id="section-quizzes" class="hidden bg-white border border-slate-200 rounded-xl p-6 space-y-2 text-center shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900">❓ Manage Quizzes</h3>
-        <p class="text-xs text-slate-500 max-w-md mx-auto">Manage module-wise quick quizzes and scoring keys.</p>
+      <div id="modal-student-content" class="space-y-3 text-xs">
+        <!-- Injected via JS -->
       </div>
 
-    </main>
-
-  </div>
-
-  <!-- ================= INDIVIDUAL STUDENT QUICK INSPECT MODAL ================= -->
-  <div id="student-profile-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-      
-      <!-- MODAL HEADER -->
-      <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
-        <div class="flex items-center space-x-3">
-          <div id="modal-avatar" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 border border-indigo-400 flex items-center justify-center text-lg font-black text-white shadow">
-            S
-          </div>
-          <div>
-            <h3 id="modal-student-name" class="font-extrabold text-base text-white leading-tight">Student Profile</h3>
-            <span id="modal-student-email" class="text-xs text-indigo-300">student@example.com</span>
-          </div>
-        </div>
-        <button onclick="closeStudentProfileModal()" class="text-slate-400 hover:text-white font-bold text-xl px-2">&times;</button>
+      <div class="pt-2 border-t border-slate-200 text-right">
+        <button onclick="closeStudentDetailModal()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-xl text-xs hover:bg-slate-700">Close</button>
       </div>
-
-      <!-- MODAL BODY CONTAINER -->
-      <div class="p-5 overflow-y-auto space-y-5">
-        
-        <!-- CONTACT & ACCOUNT DETAILS -->
-        <div class="grid grid-cols-3 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
-          <div>
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Phone Number</span>
-            <span id="modal-student-phone" class="font-bold text-slate-900">--</span>
-          </div>
-          <div>
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Registration Date</span>
-            <span id="modal-student-joined" class="font-bold text-slate-900">--</span>
-          </div>
-          <div>
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Completed Lessons</span>
-            <span id="modal-completed-lessons" class="font-bold text-emerald-600">0 Lessons</span>
-          </div>
-        </div>
-
-        <!-- ENROLLED COURSES BREAKDOWN -->
-        <div class="space-y-2">
-          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Unlocked Courses & Access Status</h4>
-          <div id="modal-courses-list" class="space-y-1.5">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- TRANSACTION & PAYMENT HISTORY -->
-        <div class="space-y-2 pt-3 border-t border-slate-100">
-          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Razorpay Payment Logs</h4>
-          <div id="modal-transactions-list" class="space-y-1.5 text-xs">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-      </div>
-
-      <!-- MODAL FOOTER -->
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-        <button id="modal-launch-dashboard-btn" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition text-xs flex items-center shadow-sm">
-          Launch Live Student Portal ↗
-        </button>
-        <button onclick="closeStudentProfileModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-xs">
-          Close
-        </button>
-      </div>
-
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- ================= JAVASCRIPT & FIREBASE LOGIC ================= -->
   <script>
-    /* 1. FIREBASE CONFIGURATION */
     const firebaseConfig = {
       apiKey: "AIzaSyBh9VQBgh3dSRug89_2NaVEOD7GPhHKvyE",
       authDomain: "careergrasppfinal.firebaseapp.com",
@@ -296,161 +183,146 @@
       appId: "1:243374148181:web:7f6a37b9ac71caf76022dc"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* 2. ADMIN AUTHENTICATION GUARD */
-    document.addEventListener('DOMContentLoaded', function() {
-      const role = localStorage.getItem('careergraspp_role');
-      const email = localStorage.getItem('careergraspp_active_email');
-
-      if (role !== 'admin' || email !== 'use-careergraspp@gmail.com') {
-        const inputPass = prompt("🔐 Admin Authentication Required\nPlease enter the Admin Master Password:");
-        if (inputPass === 'Kumar@2422') {
-          localStorage.setItem('careergraspp_role', 'admin');
-          localStorage.setItem('careergraspp_active_email', 'use-careergraspp@gmail.com');
-          loadStudentDatabase();
-        } else {
-          alert("❌ Unauthorized Admin Access!");
-          window.location.href = "index.html";
-        }
-      } else {
-        loadStudentDatabase();
-      }
-    });
-
-    /* 3. COURSE CATALOG MAPPING */
-    const courseCatalog = {
-      1: "Corporate Communication & Etiquette",
-      2: "GD & Personal Interview Mastery",
-      3: "Quantitative Aptitude & Logic",
-      4: "Resume Building & LinkedIn Branding",
-      5: "Emotional Intelligence & Workplace Empathy",
-      6: "Time Management & Productivity Hacks",
-      7: "Public Speaking & Stage Confidence",
-      8: "Critical Thinking & Problem Solving",
-      9: "Leadership & Team Dynamics",
-      10: "Negotiation & Conflict Resolution",
-      11: "Workplace Adaptability & Growth Mindset",
-      12: "Business Email & Report Writing",
-      13: "Professional Ethics & Workplace Integrity",
-      14: "Stress Management & Work-Life Balance",
-      15: "Decision Making Under Pressure",
-      16: "Networking & Relationship Building",
-      17: "Creative Thinking & Innovation",
-      18: "Interpersonal Skills & Active Listening"
-    };
-
     let allStudentsData = [];
+    let allTransactionsData = [];
+    let activeViewTab = 'students';
 
-    /* 4. FETCH STUDENT DATABASE FROM FIRESTORE */
-    async function loadStudentDatabase() {
-      const tbody = document.getElementById('student-table-body');
-      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Loading database from Firebase...</td></tr>`;
-
-      try {
-        const snapshot = await db.collection('students').get();
-        allStudentsData = [];
-        tbody.innerHTML = "";
-
-        if (snapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">No student records found in database.</td></tr>`;
-          updateMetrics(0, 0);
-          return;
-        }
-
-        let totalCoursesBoughtAll = 0;
-        let index = 1;
-
-        snapshot.forEach((doc) => {
-          const student = doc.data();
-          const email = student.email || doc.id;
-          const name = student.name || "N/A";
-          const phone = student.phone || "N/A";
-          const joinedDate = student.joinedDate || "Recent";
-          
-          const enrolledArray = student.enrolledCourses || [];
-          const courseCount = enrolledArray.length;
-          totalCoursesBoughtAll += courseCount;
-
-          const mappedCourseList = enrolledArray.map(id => {
-            const courseName = courseCatalog[id] || `Course ID #${id}`;
-            return { id: id, name: courseName };
-          });
-
-          allStudentsData.push({
-            index: index++,
-            name: name,
-            email: email,
-            phone: phone,
-            courseCount: courseCount,
-            courses: mappedCourseList,
-            joinedDate: joinedDate,
-            completedLessons: student.completedLessons || [],
-            transactions: student.transactions || [],
-            rawProfile: student
-          });
-        });
-
-        renderTableRows(allStudentsData);
-        updateMetrics(allStudentsData.length, totalCoursesBoughtAll);
-
-      } catch (err) {
-        console.error("Firestore Fetch Error:", err);
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500 font-bold">Failed to load database: ${err.message}</td></tr>`;
-      }
-    }
-
-    /* 5. RENDER HIGH-DENSITY TABLE ROWS WITH CLICKABLE "VIEW PROFILE" BUTTON */
-    function renderTableRows(dataList) {
-      const tbody = document.getElementById('student-table-body');
-      tbody.innerHTML = "";
-
-      if (dataList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-5 text-center text-slate-400">No matching student records found.</td></tr>`;
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = localStorage.getItem('careergraspp_role');
+      if (role !== 'admin') {
+        alert("🔐 Access Denied: Super Admin permissions required.");
+        window.location.href = "index.html";
         return;
       }
 
-      dataList.forEach(student => {
-        let coursesBadgeHtml = student.courses.length > 0
-          ? student.courses.map(c => `
-              <div class="inline-flex items-center space-x-1 bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded text-[9px] font-semibold m-0.5 truncate max-w-[200px]">
-                <span class="bg-indigo-600 text-white font-bold text-[8px] px-1 rounded shrink-0">#${c.id}</span>
-                <span class="truncate">${c.name}</span>
-              </div>
-            `).join('')
-          : `<span class="text-slate-400 italic text-[10px]">No active courses</span>`;
+      loadOrganizationsFilter();
+      initLiveDatabaseSync();
+    });
+
+    function loadOrganizationsFilter() {
+      db.collection('organizations').get().then((snapshot) => {
+        const select = document.getElementById('filter-org-code');
+        document.getElementById('stat-total-orgs').textContent = snapshot.size;
+
+        snapshot.forEach(doc => {
+          const org = doc.data();
+          if (org.orgCode && org.orgCode !== 'INDIVIDUAL') {
+            const opt = document.createElement('option');
+            opt.value = org.orgCode;
+            opt.textContent = `${org.orgName || org.orgCode} (${org.orgCode})`;
+            select.appendChild(opt);
+          }
+        });
+      });
+    }
+
+    function initLiveDatabaseSync() {
+      db.collection('students').onSnapshot((snapshot) => {
+        allStudentsData = [];
+        allTransactionsData = [];
+        let grossRevenue = 0;
+        let totalEnrollments = 0;
+
+        snapshot.forEach((doc) => {
+          const s = doc.data();
+          s.docId = doc.id;
+          allStudentsData.push(s);
+
+          const coursesCount = s.enrolledCourses ? s.enrolledCourses.length : 0;
+          totalEnrollments += coursesCount;
+
+          // Parse explicit transactions array
+          if (s.transactions && Array.isArray(s.transactions)) {
+            s.transactions.forEach(tx => {
+              grossRevenue += Number(tx.amount || 0);
+              allTransactionsData.push({
+                paymentId: tx.paymentId || 'N/A',
+                studentEmail: s.email,
+                courseTitle: tx.courseTitle || `Course ID #${tx.courseId}`,
+                amount: tx.amount || 0,
+                date: tx.date || s.joinedDate || 'Recent'
+              });
+            });
+          } else if (coursesCount > 0) {
+            // Fallback estimation if old account layout without transactions array
+            const estimatedAmt = coursesCount * 299;
+            grossRevenue += estimatedAmt;
+          }
+        });
+
+        // Update top KPI metric cards
+        document.getElementById('stat-total-revenue').textContent = `₹${grossRevenue.toLocaleString('en-IN')}`;
+        document.getElementById('stat-total-students').textContent = snapshot.size;
+        document.getElementById('stat-total-enrollments').textContent = totalEnrollments;
+
+        applyFilters();
+      }, (err) => {
+        console.error("Firestore sync error:", err);
+      });
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('global-search-input').value.toLowerCase().trim();
+      const orgFilter = document.getElementById('filter-org-code').value;
+
+      // Filter Students
+      const filteredStudents = allStudentsData.filter(s => {
+        const nameMatch = (s.name || "").toLowerCase().includes(query);
+        const emailMatch = (s.email || "").toLowerCase().includes(query);
+        const phoneMatch = (s.phone || "").toLowerCase().includes(query);
+        const orgMatch = (s.orgCode || "").toLowerCase().includes(query);
+        const matchesQuery = nameMatch || emailMatch || phoneMatch || orgMatch;
+
+        const matchesOrg = (orgFilter === 'ALL') || (s.orgCode === orgFilter);
+        return matchesQuery && matchesOrg;
+      });
+
+      // Filter Transactions
+      const filteredTransactions = allTransactionsData.filter(tx => {
+        const emailMatch = tx.studentEmail.toLowerCase().includes(query);
+        const payMatch = tx.paymentId.toLowerCase().includes(query);
+        const titleMatch = tx.courseTitle.toLowerCase().includes(query);
+        return emailMatch || payMatch || titleMatch;
+      });
+
+      renderStudentsTable(filteredStudents);
+      renderTransactionsTable(filteredTransactions);
+    }
+
+    function renderStudentsTable(students) {
+      const tbody = document.getElementById('student-table-body');
+      document.getElementById('student-count-badge').textContent = `Showing ${students.length} Records`;
+      tbody.innerHTML = "";
+
+      if (students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No student profiles match your search criteria.</td></tr>`;
+        return;
+      }
+
+      students.forEach(s => {
+        const isOrg = s.orgCode && s.orgCode !== 'INDIVIDUAL';
+        const coursesCount = s.enrolledCourses ? s.enrolledCourses.length : 0;
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-            <td class="p-2 text-center font-black text-slate-400 text-[10px]">${student.index}</td>
-            
-            <!-- STUDENT DETAILS CELL -->
-            <td class="p-2 truncate cursor-pointer" onclick="openStudentProfile('${student.email}')">
-              <span class="font-bold text-slate-900 block truncate hover:text-indigo-600 transition" title="${student.name}">${student.name}</span>
-              <span class="text-[10px] text-slate-500 block truncate" title="${student.email}">${student.email}</span>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3">
+              <div class="font-bold text-slate-900">${s.name || 'N/A'}</div>
+              <div class="text-[11px] text-slate-500">${s.email} • ${s.phone || 'No phone'}</div>
             </td>
-
-            <td class="p-2 font-medium text-slate-700 truncate">${student.phone}</td>
-            
-            <td class="p-2 text-center">
-              <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-black text-[10px]">
-                ${student.courseCount} ${student.courseCount === 1 ? 'Course' : 'Courses'}
+            <td class="p-3 font-semibold text-slate-700">
+              <span class="${isOrg ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded text-[10px] font-bold">
+                ${s.orgCode || 'INDIVIDUAL'}
               </span>
             </td>
-
-            <td class="p-2">
-              <div class="flex flex-wrap items-center">${coursesBadgeHtml}</div>
-            </td>
-
-            <td class="p-2 text-slate-500 text-[10px] font-medium truncate">${student.joinedDate}</td>
-
-            <!-- CLICKABLE "VIEW PROFILE" BUTTON COLUMN -->
-            <td class="p-2 text-center">
-              <button onclick="viewActualStudentProfile('${student.email}', '${student.phone}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-md text-[10px] transition shadow-xs whitespace-nowrap">
-                View Profile ↗
+            <td class="p-3 capitalize font-medium text-slate-600">${s.studentType || (isOrg ? 'Organization' : 'Individual')}</td>
+            <td class="p-3 font-bold text-indigo-600">${coursesCount} Course(s)</td>
+            <td class="p-3 text-slate-400">${s.joinedDate || 'Recent'}</td>
+            <td class="p-3 text-right">
+              <button onclick="inspectStudent('${s.email}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-[10px] transition">
+                Inspect
               </button>
             </td>
           </tr>
@@ -458,134 +330,80 @@
       });
     }
 
-    /* 6. OPEN ACTUAL STUDENT PROFILE PAGE (POST-PAYMENT DASHBOARD) */
-    function viewActualStudentProfile(email, phone) {
-      localStorage.setItem('careergraspp_active_email', email);
-      localStorage.setItem('careergraspp_active_phone', phone);
-      localStorage.setItem('careergraspp_role', 'student');
+    function renderTransactionsTable(transactions) {
+      const tbody = document.getElementById('transaction-table-body');
+      document.getElementById('transaction-count-badge').textContent = `${transactions.length} Transactions Found`;
+      tbody.innerHTML = "";
 
-      const targetUrl = `course.html?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
-      window.open(targetUrl, '_blank');
+      if (transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No payment transaction logs recorded yet.</td></tr>`;
+        return;
+      }
+
+      transactions.forEach(tx => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-mono font-bold text-slate-900">${tx.paymentId}</td>
+            <td class="p-3 text-slate-600 font-medium">${tx.studentEmail}</td>
+            <td class="p-3 font-semibold text-slate-800">${tx.courseTitle}</td>
+            <td class="p-3 font-black text-emerald-600">₹${tx.amount}</td>
+            <td class="p-3 text-slate-400">${tx.date}</td>
+          </tr>
+        `;
+      });
     }
 
-    /* 7. OPEN QUICK INSPECT MODAL */
-    function openStudentProfile(email) {
+    function inspectStudent(email) {
       const student = allStudentsData.find(s => s.email.toLowerCase() === email.toLowerCase());
       if (!student) return;
 
-      document.getElementById('modal-student-name').textContent = student.name;
-      document.getElementById('modal-student-email').textContent = student.email;
-      document.getElementById('modal-student-phone').textContent = student.phone;
-      document.getElementById('modal-student-joined').textContent = student.joinedDate;
-      document.getElementById('modal-avatar').textContent = (student.name || 'S').charAt(0).toUpperCase();
-      document.getElementById('modal-completed-lessons').textContent = `${student.completedLessons.length} Lessons Marked Done`;
+      const modalContent = document.getElementById('modal-student-content');
+      modalContent.innerHTML = `
+        <div class="bg-slate-50 p-3 rounded-xl space-y-1 border border-slate-200">
+          <p><strong>Name:</strong> ${student.name || 'N/A'}</p>
+          <p><strong>Email:</strong> ${student.email}</p>
+          <p><strong>Phone:</strong> ${student.phone || 'N/A'}</p>
+          <p><strong>Organization Code:</strong> ${student.orgCode || 'INDIVIDUAL'}</p>
+          <p><strong>Roll Number:</strong> ${student.rollNumber || 'N/A'}</p>
+          <p><strong>Joined Date:</strong> ${student.joinedDate || 'N/A'}</p>
+        </div>
 
-      const launchBtn = document.getElementById('modal-launch-dashboard-btn');
-      launchBtn.onclick = function() {
-        viewActualStudentProfile(student.email, student.phone);
-      };
+        <div>
+          <h4 class="font-bold text-slate-900 mb-1">Enrolled Course IDs:</h4>
+          <p class="font-mono bg-slate-100 p-2 rounded text-[11px]">${JSON.stringify(student.enrolledCourses || [])}</p>
+        </div>
 
-      const coursesContainer = document.getElementById('modal-courses-list');
-      coursesContainer.innerHTML = "";
-      if (student.courses.length === 0) {
-        coursesContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Student has not enrolled in any courses.</p>`;
+        <div>
+          <h4 class="font-bold text-slate-900 mb-1">Completed Lesson Keys (${(student.completedLessons || []).length}):</h4>
+          <p class="font-mono bg-slate-100 p-2 rounded text-[11px] max-h-24 overflow-y-auto">${JSON.stringify(student.completedLessons || [])}</p>
+        </div>
+      `;
+
+      document.getElementById('student-detail-modal').classList.remove('hidden');
+    }
+
+    function closeStudentDetailModal() {
+      document.getElementById('student-detail-modal').classList.add('hidden');
+    }
+
+    function switchViewTab(tab) {
+      activeViewTab = tab;
+      const btnStudents = document.getElementById('tab-btn-students');
+      const btnTx = document.getElementById('tab-btn-transactions');
+      const containerStudents = document.getElementById('view-students-container');
+      const containerTx = document.getElementById('view-transactions-container');
+
+      if (tab === 'students') {
+        btnStudents.className = "px-5 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition font-bold";
+        btnTx.className = "px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        containerStudents.classList.remove('hidden');
+        containerTx.classList.add('hidden');
       } else {
-        student.courses.forEach(c => {
-          coursesContainer.innerHTML += `
-            <div class="p-2.5 bg-indigo-50/60 border border-indigo-200 rounded-lg flex items-center justify-between text-xs">
-              <div class="flex items-center space-x-2">
-                <span class="w-5 h-5 rounded bg-indigo-600 text-white font-black text-[9px] flex items-center justify-center">#${c.id}</span>
-                <span class="font-bold text-slate-900">${c.name}</span>
-              </div>
-              <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[9px] px-2 py-0.5 rounded-full">Active Access</span>
-            </div>
-          `;
-        });
+        btnTx.className = "px-5 py-2 rounded-lg bg-white text-emerald-600 shadow-sm transition font-bold";
+        btnStudents.className = "px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        containerTx.classList.remove('hidden');
+        containerStudents.classList.add('hidden');
       }
-
-      const txContainer = document.getElementById('modal-transactions-list');
-      txContainer.innerHTML = "";
-      if (student.transactions.length === 0) {
-        txContainer.innerHTML = `<p class="text-xs text-slate-400 italic">No stored Razorpay payment records.</p>`;
-      } else {
-        student.transactions.forEach(tx => {
-          txContainer.innerHTML += `
-            <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center text-[11px]">
-              <div>
-                <span class="font-bold text-slate-900 block">${tx.courseTitle || 'Course Purchase'}</span>
-                <span class="text-[9px] text-slate-500 font-mono">Payment ID: ${tx.paymentId || 'N/A'}</span>
-              </div>
-              <div class="text-right">
-                <span class="font-black text-emerald-600 block">₹${tx.amount || 250}</span>
-                <span class="text-[9px] text-slate-400">${tx.date || ''}</span>
-              </div>
-            </div>
-          `;
-        });
-      }
-
-      document.getElementById('student-profile-modal').classList.remove('hidden');
-    }
-
-    function closeStudentProfileModal() {
-      document.getElementById('student-profile-modal').classList.add('hidden');
-    }
-
-    /* 8. TAB SWITCHING LOGIC */
-    function switchAdminTab(tabKey) {
-      const tabs = ['students', 'org', 'courses', 'tests', 'quizzes'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`nav-${t}`);
-        const sec = document.getElementById(`section-${t}`);
-        if (btn && sec) {
-          if (t === tabKey) {
-            btn.className = "w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm";
-            sec.classList.remove('hidden');
-          } else {
-            btn.className = "w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold transition text-slate-300 hover:bg-slate-800 hover:text-white";
-            sec.classList.add('hidden');
-          }
-        }
-      });
-    }
-
-    /* 9. METRICS UPDATER */
-    function updateMetrics(totalStudents, totalPurchases) {
-      document.getElementById('stat-total-students').textContent = totalStudents;
-      document.getElementById('stat-total-purchases').textContent = totalPurchases;
-      const avg = totalStudents > 0 ? (totalPurchases / totalStudents).toFixed(1) : "0";
-      document.getElementById('stat-avg-courses').textContent = avg;
-    }
-
-    /* 10. SEARCH FILTER */
-    function filterDatabaseTable() {
-      const query = document.getElementById('search-input').value.toLowerCase().trim();
-      const filtered = allStudentsData.filter(s => {
-        return s.name.toLowerCase().includes(query) ||
-               s.email.toLowerCase().includes(query) ||
-               s.phone.toLowerCase().includes(query) ||
-               s.courses.some(c => c.name.toLowerCase().includes(query) || c.id.toString() === query);
-      });
-      renderTableRows(filtered);
-    }
-
-    /* 11. EXPORT CSV */
-    function exportToCSV() {
-      if (!allStudentsData || allStudentsData.length === 0) return alert("No student data available.");
-      let csvContent = "data:text/csv;charset=utf-8,S.No,Student Name,Email Address,Phone Number,Total Courses Purchased,Enrolled Course IDs,Enrolled Course Titles,Joined Date\n";
-
-      allStudentsData.forEach(s => {
-        const ids = `"${s.courses.map(c => c.id).join(' | ')}"`;
-        const titles = `"${s.courses.map(c => c.name).join(' | ')}"`;
-        csvContent += `${s.index},"${s.name}","${s.email}","${s.phone}",${s.courseCount},${ids},${titles},"${s.joinedDate}"\n`;
-      });
-
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `Careergraspp_Students_Database_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
 
     function adminLogout() {
