@@ -9,6 +9,7 @@
 
   <!-- FIREBASE SDKs (v9 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -251,7 +252,7 @@
       "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop"
     ];
 
-    const softSkillsCourses = courseTitlesList.map((title, idx) => {
+    const defaultCourses = courseTitlesList.map((title, idx) => {
       const id = idx + 1;
       return {
         id: id,
@@ -319,7 +320,54 @@
       };
     });
 
+    /* REAL-TIME FIRESTORE COURSE CATALOG SYNC */
+    let softSkillsCourses = defaultCourses;
+
+    function initCourseCatalogSync() {
+      // 1. Instantly check local storage cache
+      const localCache = localStorage.getItem('careergraspp_courses');
+      if (localCache) {
+        try {
+          const parsed = JSON.parse(localCache);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            softSkillsCourses = parsed;
+          }
+        } catch (e) {
+          console.warn("Invalid cached courses", e);
+        }
+      }
+
+      // 2. Real-time Firestore sync listener
+      try {
+        db.collection('courses').orderBy('id', 'asc').onSnapshot((snapshot) => {
+          if (!snapshot.empty) {
+            const fetched = [];
+            snapshot.forEach((doc) => {
+              fetched.push(doc.data());
+            });
+            softSkillsCourses = fetched;
+            localStorage.setItem('careergraspp_courses', JSON.stringify(fetched));
+          } else {
+            softSkillsCourses = defaultCourses;
+          }
+
+          if (activeStudentProfile) {
+            renderDashboardGrid(activeStudentProfile);
+          }
+        }, (err) => {
+          console.error("Firestore catalog error, using local fallback:", err);
+          if (activeStudentProfile) {
+            renderDashboardGrid(activeStudentProfile);
+          }
+        });
+      } catch (err) {
+        console.error("Firebase connection error:", err);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async function() {
+      initCourseCatalogSync();
+
       const urlParams = new URLSearchParams(window.location.search);
       let email = urlParams.get('email') || localStorage.getItem('careergraspp_active_email');
       let phone = urlParams.get('phone') || localStorage.getItem('careergraspp_active_phone');
@@ -438,7 +486,7 @@
           <div class="bg-indigo-50/70 border-l-2 border-indigo-600 p-2.5 rounded-r-lg space-y-1">
             <p class="font-bold text-[11px] text-slate-900 uppercase tracking-wide">${mod.title}</p>
             <ul class="space-y-1 pl-1">
-              ${mod.points.map(pt => `<li class="text-[11px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1.5">•</span><span>${pt}</span></li>`).join('')}
+              ${(mod.points || []).map(pt => `<li class="text-[11px] text-slate-700 flex items-start"><span class="text-indigo-600 font-bold mr-1.5">•</span><span>${pt}</span></li>`).join('')}
             </ul>
           </div>
         `).join('');
@@ -447,8 +495,9 @@
           <div class="space-y-1.5">
             <p class="font-bold text-[11px] text-slate-800 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">${part.partTitle}</p>
             <div class="space-y-1">
-              ${part.lessons.map(les => {
-                const isCompleted = completedSet.has(les.key);
+              ${(part.lessons || []).map(les => {
+                const lessonKey = les.key || `${course.id}_${les.title.replace(/\s+/g, '_')}`;
+                const isCompleted = completedSet.has(lessonKey);
                 return `
                   <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2 text-xs">
                     <div class="flex items-center space-x-2 truncate">
@@ -459,7 +508,7 @@
                       <span class="font-semibold text-slate-800 truncate">${les.title}</span>
                     </div>
                     <div class="flex items-center space-x-1.5 flex-shrink-0">
-                      <button onclick="handleLessonAccess(${isExpired}, '${les.key}', '${les.title}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3 py-1.5 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded-lg transition text-xs shadow-sm">▶ Play</button>
+                      <button onclick="handleLessonAccess(${isExpired}, '${lessonKey}', '${les.title.replace(/'/g, "\\'")}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3 py-1.5 ${isExpired ? 'bg-slate-400 hover:bg-slate-500' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-bold rounded-lg transition text-xs shadow-sm">▶ Play</button>
                       <a href="${isExpired ? '#' : les.pdfUrl}" onclick="${isExpired ? `handleExpiredNotice(); return false;` : ''}" target="${isExpired ? '_self' : '_blank'}" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-xs">📄 PDF</a>
                     </div>
                   </div>
@@ -483,7 +532,7 @@
                     ${validityBadgeHtml}
                   </div>
                   <h3 class="text-xl font-black text-slate-900">${course.title}</h3>
-                  <p class="text-xs text-slate-500">6 Months Access • 4 HD Video Modules • PDF Guides</p>
+                  <p class="text-xs text-slate-500">6 Months Access • ${course.partsList ? course.partsList.length : 4} HD Video Modules • PDF Guides</p>
                 </div>
               </div>
 
@@ -543,7 +592,7 @@
     }
 
     function handleExpiredNotice() {
-      alert("⚠️ Your course validity is over please renew for long access.");
+      alert("⚠️ Your course validity is over. Please renew your enrollment for access.");
       logoutStudentSilent();
     }
 
@@ -612,7 +661,7 @@
       const containerBox = document.getElementById('video-container-box');
       
       let driveFileId = "";
-      if (rawVideoUrl.includes('drive.google.com')) {
+      if (rawVideoUrl && rawVideoUrl.includes('drive.google.com')) {
         const driveIdMatch = rawVideoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (driveIdMatch && driveIdMatch[1]) driveFileId = driveIdMatch[1];
       }
@@ -628,7 +677,7 @@
         containerBox.innerHTML = `<video class="w-full h-full object-contain rounded-xl" controls autoplay><source src="${rawVideoUrl}" type="video/mp4" /></video>`;
       }
 
-      document.getElementById('video-pdf-link').href = rawPdfUrl;
+      document.getElementById('video-pdf-link').href = rawPdfUrl || "#";
       toggleLessonCompletion(key);
       document.getElementById('video-player-modal').classList.remove('hidden');
     }
@@ -637,7 +686,7 @@
       const key = keyOverride || currentPlayingLessonKey;
       if (!key || !activeStudentProfile || !activeStudentProfile.email) return;
 
-      const userDocRef = db.collection('students').doc(activeStudentProfile.email);
+      const userDocRef = db.collection('students').doc(activeStudentProfile.email.toLowerCase());
       try {
         await userDocRef.update({
           completedLessons: firebase.firestore.FieldValue.arrayUnion(key)
