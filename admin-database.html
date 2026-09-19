@@ -19,20 +19,23 @@
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
   <!-- ================= TOP NAVIGATION HEADER ================= -->
-  <header class="bg-slate-900 text-white p-4 shadow-lg sticky top-0 z-40 border-b border-slate-800">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
+  <header class="bg-slate-900 text-white p-3.5 shadow-lg sticky top-0 z-40 border-b border-slate-800">
+    <div class="w-full px-4 md:px-8 flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center font-black text-slate-950 text-lg shadow">⚙️</div>
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center font-black text-slate-950 text-base shadow">⚙️</div>
         <div>
-          <h1 class="font-extrabold text-base leading-none tracking-tight">Super Admin Database</h1>
-          <span class="text-[10px] text-amber-400 font-bold tracking-widest uppercase">Master Revenue & Roster Console</span>
+          <h1 class="font-extrabold text-sm md:text-base leading-none tracking-tight">Super Admin Database</h1>
+          <span class="text-[9px] text-amber-400 font-bold tracking-widest uppercase">Master Revenue & Student Roster Console</span>
         </div>
       </div>
       <div class="flex items-center space-x-3">
-        <a href="admin-courses.html" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
+        <button onclick="exportTableToCSV()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+          <span>📥 Export Excel</span>
+        </button>
+        <a href="admin-courses.html" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
           📚 Manage Courses
         </a>
-        <button onclick="adminLogout()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
+        <button onclick="adminLogout()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
           Log Out
         </button>
       </div>
@@ -40,85 +43,116 @@
   </header>
 
   <!-- ================= MAIN CONTENT CONTAINER ================= -->
-  <main class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+  <main class="w-full px-4 md:px-8 py-4 space-y-4">
 
-    <!-- METRICS OVERVIEW CARDS -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Gross Revenue</span>
-        <h3 id="stat-total-revenue" class="text-3xl font-black text-emerald-600">₹0</h3>
-        <span class="text-[10px] text-slate-400">Summed from all Razorpay transactions</span>
+    <!-- COMPACT MINIMIZED METRICS CARDS BANNER -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Revenue</span>
+          <h3 id="stat-total-revenue" class="text-xl font-black text-emerald-600">₹0</h3>
+        </div>
+        <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600 text-lg">💰</span>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Registered Students</span>
-        <h3 id="stat-total-students" class="text-3xl font-black text-slate-900">0</h3>
-        <span class="text-[10px] text-slate-400">Active accounts across all colleges</span>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Registered Students</span>
+          <h3 id="stat-total-students" class="text-xl font-black text-slate-900">0</h3>
+        </div>
+        <span class="p-2 rounded-lg bg-slate-100 text-slate-700 text-lg">🎓</span>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Course Enrollments</span>
-        <h3 id="stat-total-enrollments" class="text-3xl font-black text-indigo-600">0</h3>
-        <span class="text-[10px] text-slate-400">Unlocked course licenses</span>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Course Enrollments</span>
+          <h3 id="stat-total-enrollments" class="text-xl font-black text-indigo-600">0</h3>
+        </div>
+        <span class="p-2 rounded-lg bg-indigo-50 text-indigo-600 text-lg">📚</span>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Institutional Partners</span>
-        <h3 id="stat-total-orgs" class="text-3xl font-black text-amber-500">0</h3>
-        <span class="text-[10px] text-slate-400">Registered campus org codes</span>
+      <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Institutional Partners</span>
+          <h3 id="stat-total-orgs" class="text-xl font-black text-amber-500">0</h3>
+        </div>
+        <span class="p-2 rounded-lg bg-amber-50 text-amber-600 text-lg">🏢</span>
       </div>
     </div>
 
-    <!-- TABS AND SEARCH FILTER BAR -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-4">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- TABS AND ADVANCED DUAL FILTER BAR -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-3 md:p-4 shadow-sm space-y-3">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
         
         <!-- View Toggle Buttons -->
-        <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold w-full md:w-auto">
-          <button id="tab-btn-students" onclick="switchViewTab('students')" class="px-5 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition">
+        <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold w-full lg:w-auto">
+          <button id="tab-btn-students" onclick="switchViewTab('students')" class="px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition">
             🎓 Student Profiles
           </button>
-          <button id="tab-btn-transactions" onclick="switchViewTab('transactions')" class="px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
+          <button id="tab-btn-transactions" onclick="switchViewTab('transactions')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
             💳 Transaction Logs
+          </button>
+          <button id="tab-btn-sell-course" onclick="switchViewTab('sell-course')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
+            🏷️ Sell Course Link
           </button>
         </div>
 
-        <!-- Search & Filter Controls -->
-        <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
-          <input type="text" id="global-search-input" onkeyup="applyFilters()" placeholder="Search Name, Email, Phone, Org Code..." class="w-full sm:w-72 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+        <!-- SEARCH & DUAL DROPDOWN FILTERS -->
+        <div id="search-filter-controls" class="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto">
           
-          <select id="filter-org-code" onchange="applyFilters()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-600">
-            <option value="ALL">All Organizations</option>
-            <option value="INDIVIDUAL">Individual Signups</option>
-            <!-- Dynamic Org options injected here -->
+          <!-- Search Field -->
+          <input type="text" id="global-search-input" onkeyup="applyFilters()" placeholder="Search Name, Email, Phone, Org Code..." class="w-full sm:w-60 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
+          
+          <!-- Filter 1: Organization Category / Target Audience -->
+          <select id="filter-category" onchange="applyFilters()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-600">
+            <option value="ALL">All Categories</option>
+            <option value="engineering">Engineering College</option>
+            <option value="school">School</option>
+            <option value="intermediate">Intermediate / Jr College</option>
+            <option value="degree">Degree College</option>
           </select>
+
+          <!-- Filter 2: Unique College Codes Dropdown -->
+          <select id="filter-org-code" onchange="applyFilters()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-600">
+            <option value="ALL">All Colleges / Orgs</option>
+            <option value="INDIVIDUAL">INDIVIDUAL</option>
+            <!-- Dynamic Unique College Codes injected here -->
+          </select>
+
         </div>
 
       </div>
     </div>
 
-    <!-- ================= VIEW 1: STUDENT ROSTER TABLE ================= -->
-    <div id="view-students-container" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+    <!-- ================= VIEW 1: STUDENT ROSTER TABLE (FULL SCREEN WIDTH) ================= -->
+    <div id="view-students-container" class="bg-white border border-slate-200 rounded-2xl p-3 md:p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <h2 class="text-base font-extrabold text-slate-900">Registered Student Profiles</h2>
+        <div>
+          <h2 class="text-base font-extrabold text-slate-900">Registered Student Master Profiles</h2>
+          <p class="text-[11px] text-slate-500">Click anywhere on a row or the 👁️ icon to inspect details.</p>
+        </div>
         <span id="student-count-badge" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-3 py-1 rounded-full border border-indigo-200">Showing 0 Records</span>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse text-[11px]">
           <thead>
-            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px]">
-              <th class="p-3">Student Details</th>
-              <th class="p-3">College / Org Code</th>
-              <th class="p-3">Type</th>
-              <th class="p-3">Enrolled Courses</th>
-              <th class="p-3">Joined Date</th>
-              <th class="p-3 text-right">Actions</th>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px] whitespace-nowrap">
+              <th class="p-2">Student Name & Mobile</th>
+              <th class="p-2">Email Address</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">College Code</th>
+              <th class="p-2">Course Purchased</th>
+              <th class="p-2">Amount</th>
+              <th class="p-2">Payment ID</th>
+              <th class="p-2">Date</th>
+              <th class="p-2 text-center">Profile</th>
+              <th class="p-2 text-center">Delete</th>
             </tr>
           </thead>
           <tbody id="student-table-body" class="divide-y divide-slate-100">
             <tr>
-              <td colspan="6" class="p-6 text-center text-slate-400">Loading master student database...</td>
+              <td colspan="10" class="p-6 text-center text-slate-400">Loading master student database...</td>
             </tr>
           </tbody>
         </table>
@@ -126,48 +160,128 @@
     </div>
 
     <!-- ================= VIEW 2: PAYMENT TRANSACTION LOGS TABLE ================= -->
-    <div id="view-transactions-container" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 hidden">
+    <div id="view-transactions-container" class="bg-white border border-slate-200 rounded-2xl p-3 md:p-4 shadow-sm space-y-3 hidden">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
         <h2 class="text-base font-extrabold text-slate-900">Razorpay Payment Transaction Logs</h2>
         <span id="transaction-count-badge" class="text-xs bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full border border-emerald-200">0 Transactions Found</span>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse text-[11px]">
           <thead>
-            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px]">
-              <th class="p-3">Payment ID (Razorpay)</th>
-              <th class="p-3">Student Email</th>
-              <th class="p-3">Course Purchased</th>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Date & Time</th>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px] whitespace-nowrap">
+              <th class="p-2">Payment ID (Razorpay)</th>
+              <th class="p-2">Student Email</th>
+              <th class="p-2">Course Purchased</th>
+              <th class="p-2">Amount</th>
+              <th class="p-2">Date & Time</th>
+              <th class="p-2 text-center">Action</th>
             </tr>
           </thead>
           <tbody id="transaction-table-body" class="divide-y divide-slate-100">
             <tr>
-              <td colspan="5" class="p-6 text-center text-slate-400">Loading payment transaction logs...</td>
+              <td colspan="6" class="p-6 text-center text-slate-400">Loading payment transaction logs...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- ================= VIEW 3: SELL COURSE / CAMPAIGN LINK GENERATOR ================= -->
+    <div id="view-sell-course-container" class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm space-y-6 hidden max-w-3xl mx-auto">
+      <div class="border-b border-slate-100 pb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900 flex items-center">
+            <span class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 text-sm">🏷️</span>
+            Sell Course & Generate Custom Link
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Create customized enrollment links with custom pricing and institutional mapping.</p>
+        </div>
+        <span class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full font-bold">Campaign Link Tool</span>
+      </div>
+
+      <form id="sell-course-form" onsubmit="generateCampaignLink(event)" class="space-y-5">
+        
+        <!-- 1. TARGET AUDIENCE DROPDOWN -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Target Audience Category</label>
+          <select id="sell-target-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-indigo-600">
+            <option value="engineering">Engineering College</option>
+            <option value="school">School</option>
+            <option value="intermediate">Intermediate / Jr College</option>
+            <option value="degree">Degree College</option>
+          </select>
+        </div>
+
+        <!-- 2. ORGANIZATION NAME -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Name of the Organization</label>
+          <input type="text" id="sell-org-name" required placeholder="e.g. Mahatma Gandhi Institute of Technology" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-600 transition" />
+        </div>
+
+        <!-- 3. COLLEGE / ORG CODE -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">College / Organization Code</label>
+          <input type="text" id="sell-org-code" required placeholder="e.g. MGIT2026" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono uppercase focus:outline-none focus:border-indigo-600 transition" />
+        </div>
+
+        <!-- 4. COURSE SELECTION (MULTI-SELECT CHECKBOXES) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Select Course(s) Offered to Organization</label>
+          <div id="sell-course-checkbox-list" class="max-h-52 overflow-y-auto bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+            <p class="text-xs text-slate-400">Loading courses list...</p>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Select one or multiple courses. Checked course IDs will be separated by commas in the generated URL.</p>
+        </div>
+
+        <!-- 5. CUSTOM OFFER PRICE -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Enter Course Special Offer Price (₹)</label>
+          <input type="number" id="sell-custom-price" required min="1" placeholder="e.g. 199" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-emerald-600 focus:outline-none focus:border-indigo-600 transition" />
+        </div>
+
+        <!-- GENERATE BUTTON -->
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition flex items-center justify-center space-x-2">
+          <span>🚀 Generate Institutional Campaign Link</span>
+        </button>
+      </form>
+
+      <!-- GENERATED LINK OUTPUT BOX -->
+      <div id="sell-link-output-box" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-emerald-800 uppercase tracking-wider">🎉 Campaign Link Generated Successfully</span>
+          <span id="sell-link-badge" class="text-[10px] bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full font-bold"></span>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+          <input type="text" id="sell-generated-url" readonly class="w-full px-3 py-2.5 bg-white border border-emerald-300 rounded-xl text-xs font-mono text-slate-800 select-all focus:outline-none" />
+          <button onclick="copyGeneratedCampaignLink()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex-shrink-0 transition shadow-md">
+            📋 Copy Link
+          </button>
+        </div>
+        <p class="text-[11px] text-emerald-700">Directly share this custom campaign link with the students, TPO, or school administration.</p>
+      </div>
+    </div>
+
   </main>
 
-  <!-- ================= STUDENT DETAIL MODAL ================= -->
+  <!-- ================= STUDENT DETAIL INSPECTOR MODAL ================= -->
   <div id="student-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl space-y-4 p-6">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl space-y-4 p-6 md:p-8">
       <div class="flex justify-between items-center pb-3 border-b border-slate-200">
-        <h3 class="font-extrabold text-base text-slate-900">Student Profile Inspector</h3>
-        <button onclick="closeStudentDetailModal()" class="text-slate-400 hover:text-slate-800 font-bold text-xl px-2">&times;</button>
+        <div>
+          <h3 class="font-extrabold text-lg text-slate-900">Student Profile Inspector</h3>
+          <p class="text-xs text-slate-500">Full registered record & transaction details</p>
+        </div>
+        <button onclick="closeStudentDetailModal()" class="text-slate-400 hover:text-slate-800 font-bold text-2xl px-2">&times;</button>
       </div>
 
-      <div id="modal-student-content" class="space-y-3 text-xs">
-        <!-- Injected via JS -->
-      </div>
+      <div id="modal-student-content" class="space-y-4 text-xs"></div>
 
-      <div class="pt-2 border-t border-slate-200 text-right">
-        <button onclick="closeStudentDetailModal()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-xl text-xs hover:bg-slate-700">Close</button>
+      <div class="pt-3 border-t border-slate-200 text-right">
+        <button onclick="closeStudentDetailModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition">
+          Close Profile
+        </button>
       </div>
     </div>
   </div>
@@ -188,7 +302,26 @@
 
     let allStudentsData = [];
     let allTransactionsData = [];
+    let softSkillsCourses = [];
+    let orgsMap = {};
     let activeViewTab = 'students';
+
+    const courseTitlesList = [
+      "Corporate Communication & Etiquette", "GD & Personal Interview Mastery", "Quantitative Aptitude & Logic",
+      "Resume Building & LinkedIn Branding", "Emotional Intelligence & Workplace Empathy", "Time Management & Productivity Hacks",
+      "Public Speaking & Stage Confidence", "Critical Thinking & Problem Solving", "Leadership & Team Dynamics",
+      "Negotiation & Conflict Resolution", "Workplace Adaptability & Growth Mindset", "Business Email & Report Writing",
+      "Professional Ethics & Workplace Integrity", "Stress Management & Work-Life Balance", "Decision Making Under Pressure",
+      "Networking & Relationship Building", "Creative Thinking & Innovation", "Interpersonal Skills & Active Listening"
+    ];
+
+    const pricesList = [250, 499, 399, 299, 349, 299, 449, 399, 499, 349, 299, 249, 199, 299, 399, 349, 299, 249];
+
+    const defaultCoursesList = courseTitlesList.map((title, idx) => ({
+      id: idx + 1,
+      title: title,
+      price: pricesList[idx]
+    }));
 
     document.addEventListener('DOMContentLoaded', () => {
       const role = localStorage.getItem('careergraspp_role');
@@ -199,23 +332,62 @@
       }
 
       loadOrganizationsFilter();
+      loadCoursesCatalog();
       initLiveDatabaseSync();
     });
 
+    function loadCoursesCatalog() {
+      db.collection('courses').orderBy('id', 'asc').get().then((snapshot) => {
+        if (!snapshot.empty) {
+          softSkillsCourses = [];
+          snapshot.forEach(doc => softSkillsCourses.push(doc.data()));
+        } else {
+          softSkillsCourses = defaultCoursesList;
+        }
+        populateSellCourseCheckboxes();
+      }).catch((err) => {
+        console.warn("Could not fetch courses from Firestore, loading defaults.", err);
+        softSkillsCourses = defaultCoursesList;
+        populateSellCourseCheckboxes();
+      });
+    }
+
     function loadOrganizationsFilter() {
       db.collection('organizations').get().then((snapshot) => {
-        const select = document.getElementById('filter-org-code');
         document.getElementById('stat-total-orgs').textContent = snapshot.size;
-
         snapshot.forEach(doc => {
           const org = doc.data();
           if (org.orgCode && org.orgCode !== 'INDIVIDUAL') {
-            const opt = document.createElement('option');
-            opt.value = org.orgCode;
-            opt.textContent = `${org.orgName || org.orgCode} (${org.orgCode})`;
-            select.appendChild(opt);
+            orgsMap[org.orgCode.toUpperCase().trim()] = org;
           }
         });
+        populateUniqueOrgCodesDropdown();
+      });
+    }
+
+    function populateUniqueOrgCodesDropdown() {
+      const select = document.getElementById('filter-org-code');
+      if (!select) return;
+
+      const uniqueCodes = new Set();
+      
+      Object.keys(orgsMap).forEach(code => {
+        if (code && code !== 'INDIVIDUAL') uniqueCodes.add(code);
+      });
+
+      allStudentsData.forEach(s => {
+        if (s.orgCode && s.orgCode.toUpperCase().trim() !== 'INDIVIDUAL') {
+          uniqueCodes.add(s.orgCode.toUpperCase().trim());
+        }
+      });
+
+      select.innerHTML = `<option value="ALL">All Colleges / Orgs</option><option value="INDIVIDUAL">INDIVIDUAL</option>`;
+
+      Array.from(uniqueCodes).sort().forEach(code => {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = code; // Only College Code displayed
+        select.appendChild(opt);
       });
     }
 
@@ -234,7 +406,6 @@
           const coursesCount = s.enrolledCourses ? s.enrolledCourses.length : 0;
           totalEnrollments += coursesCount;
 
-          // Parse explicit transactions array
           if (s.transactions && Array.isArray(s.transactions)) {
             s.transactions.forEach(tx => {
               grossRevenue += Number(tx.amount || 0);
@@ -243,21 +414,25 @@
                 studentEmail: s.email,
                 courseTitle: tx.courseTitle || `Course ID #${tx.courseId}`,
                 amount: tx.amount || 0,
-                date: tx.date || s.joinedDate || 'Recent'
+                date: tx.date || s.joinedDate || 'Recent',
+                timestamp: tx.timestamp || s.joinedTimestamp || 0
               });
             });
           } else if (coursesCount > 0) {
-            // Fallback estimation if old account layout without transactions array
             const estimatedAmt = coursesCount * 299;
             grossRevenue += estimatedAmt;
           }
         });
 
-        // Update top KPI metric cards
+        // SORT LATEST FIRST (DESCENDING ORDER)
+        allStudentsData.sort((a, b) => (b.joinedTimestamp || 0) - (a.joinedTimestamp || 0));
+        allTransactionsData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
         document.getElementById('stat-total-revenue').textContent = `₹${grossRevenue.toLocaleString('en-IN')}`;
         document.getElementById('stat-total-students').textContent = snapshot.size;
         document.getElementById('stat-total-enrollments').textContent = totalEnrollments;
 
+        populateUniqueOrgCodesDropdown();
         applyFilters();
       }, (err) => {
         console.error("Firestore sync error:", err);
@@ -266,9 +441,9 @@
 
     function applyFilters() {
       const query = document.getElementById('global-search-input').value.toLowerCase().trim();
+      const categoryFilter = document.getElementById('filter-category').value.toLowerCase();
       const orgFilter = document.getElementById('filter-org-code').value;
 
-      // Filter Students
       const filteredStudents = allStudentsData.filter(s => {
         const nameMatch = (s.name || "").toLowerCase().includes(query);
         const emailMatch = (s.email || "").toLowerCase().includes(query);
@@ -276,11 +451,15 @@
         const orgMatch = (s.orgCode || "").toLowerCase().includes(query);
         const matchesQuery = nameMatch || emailMatch || phoneMatch || orgMatch;
 
-        const matchesOrg = (orgFilter === 'ALL') || (s.orgCode === orgFilter);
-        return matchesQuery && matchesOrg;
+        const orgDoc = orgsMap[(s.orgCode || "").toUpperCase().trim()] || {};
+        const studentCategory = (s.targetType || s.category || orgDoc.targetType || "").toLowerCase();
+        
+        const matchesCategory = (categoryFilter === 'all') || (studentCategory.includes(categoryFilter));
+        const matchesOrg = (orgFilter === 'ALL') || ((s.orgCode || "").toUpperCase().trim() === orgFilter);
+
+        return matchesQuery && matchesCategory && matchesOrg;
       });
 
-      // Filter Transactions
       const filteredTransactions = allTransactionsData.filter(tx => {
         const emailMatch = tx.studentEmail.toLowerCase().includes(query);
         const payMatch = tx.paymentId.toLowerCase().includes(query);
@@ -298,31 +477,59 @@
       tbody.innerHTML = "";
 
       if (students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No student profiles match your search criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">No student profiles match your search criteria.</td></tr>`;
         return;
       }
 
       students.forEach(s => {
-        const isOrg = s.orgCode && s.orgCode !== 'INDIVIDUAL';
+        const isOrg = s.orgCode && s.orgCode.toUpperCase().trim() !== 'INDIVIDUAL';
+        const orgDoc = orgsMap[(s.orgCode || "").toUpperCase().trim()] || {};
+        
+        const categoryLabel = (s.targetType || orgDoc.targetType || (isOrg ? "College" : "Individual")).toUpperCase();
         const coursesCount = s.enrolledCourses ? s.enrolledCourses.length : 0;
+        
+        let latestTx = { paymentId: 'N/A', amount: 'N/A', courseTitle: 'N/A' };
+        if (s.transactions && s.transactions.length > 0) {
+          latestTx = s.transactions[s.transactions.length - 1];
+        }
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3">
-              <div class="font-bold text-slate-900">${s.name || 'N/A'}</div>
-              <div class="text-[11px] text-slate-500">${s.email} • ${s.phone || 'No phone'}</div>
+          <tr onclick="inspectStudent('${s.email}')" class="hover:bg-indigo-50/60 cursor-pointer transition whitespace-nowrap group">
+            <td class="p-2">
+              <div class="font-extrabold text-slate-900 group-hover:text-indigo-600 transition">${s.name || 'N/A'}</div>
+              <div class="text-[10px] text-slate-500">${s.phone || 'No Phone'}</div>
             </td>
-            <td class="p-3 font-semibold text-slate-700">
-              <span class="${isOrg ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded text-[10px] font-bold">
+            <td class="p-2 font-semibold text-slate-700">${s.email}</td>
+            <td class="p-2">
+              <span class="bg-slate-100 text-slate-700 border border-slate-200 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">
+                ${categoryLabel}
+              </span>
+            </td>
+            <td class="p-2 font-semibold text-slate-700">
+              <span class="${isOrg ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-600'} px-1.5 py-0.5 rounded text-[9px] font-bold">
                 ${s.orgCode || 'INDIVIDUAL'}
               </span>
             </td>
-            <td class="p-3 capitalize font-medium text-slate-600">${s.studentType || (isOrg ? 'Organization' : 'Individual')}</td>
-            <td class="p-3 font-bold text-indigo-600">${coursesCount} Course(s)</td>
-            <td class="p-3 text-slate-400">${s.joinedDate || 'Recent'}</td>
-            <td class="p-3 text-right">
-              <button onclick="inspectStudent('${s.email}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-[10px] transition">
-                Inspect
+            <td class="p-2 font-bold text-indigo-600 truncate max-w-[150px]">
+              ${latestTx.courseTitle || `${coursesCount} Course(s)`}
+            </td>
+            <td class="p-2 font-black text-emerald-600">
+              ${latestTx.amount !== 'N/A' ? `₹${latestTx.amount}` : 'N/A'}
+            </td>
+            <td class="p-2 font-mono font-bold text-slate-800 text-[10px]">
+              ${latestTx.paymentId || 'N/A'}
+            </td>
+            <td class="p-2 text-slate-400 font-medium text-[10px]">
+              ${s.joinedDate || 'Recent'}
+            </td>
+            <td class="p-2 text-center" onclick="event.stopPropagation(); inspectStudent('${s.email}');">
+              <button class="p-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold rounded-lg text-xs transition shadow-sm" title="Inspect Profile">
+                👁️
+              </button>
+            </td>
+            <td class="p-2 text-center" onclick="event.stopPropagation(); deleteStudent(event, '${s.email}');">
+              <button class="p-1.5 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-lg text-xs transition shadow-sm" title="Delete Student">
+                🗑️
               </button>
             </td>
           </tr>
@@ -336,46 +543,158 @@
       tbody.innerHTML = "";
 
       if (transactions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No payment transaction logs recorded yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No payment transaction logs recorded yet.</td></tr>`;
         return;
       }
 
       transactions.forEach(tx => {
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-mono font-bold text-slate-900">${tx.paymentId}</td>
-            <td class="p-3 text-slate-600 font-medium">${tx.studentEmail}</td>
-            <td class="p-3 font-semibold text-slate-800">${tx.courseTitle}</td>
-            <td class="p-3 font-black text-emerald-600">₹${tx.amount}</td>
-            <td class="p-3 text-slate-400">${tx.date}</td>
+          <tr class="hover:bg-slate-50 transition whitespace-nowrap">
+            <td class="p-2 font-mono font-bold text-slate-900">${tx.paymentId}</td>
+            <td class="p-2 text-slate-600 font-medium">${tx.studentEmail}</td>
+            <td class="p-2 font-semibold text-slate-800">${tx.courseTitle}</td>
+            <td class="p-2 font-black text-emerald-600">₹${tx.amount}</td>
+            <td class="p-2 text-slate-400 text-[10px]">${tx.date}</td>
+            <td class="p-2 text-center">
+              <button onclick="deleteTransaction(event, '${tx.studentEmail}', '${tx.paymentId}')" class="p-1.5 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-lg text-xs transition shadow-sm" title="Delete Transaction">
+                🗑️
+              </button>
+            </td>
           </tr>
         `;
       });
+    }
+
+    /* ================= DELETE STUDENT RECORD ================= */
+    async function deleteStudent(event, email) {
+      if (event) event.stopPropagation();
+      if (!confirm(`⚠️ Are you sure you want to PERMANENTLY delete student record for:\n${email}?`)) return;
+
+      try {
+        await db.collection('students').doc(email.toLowerCase()).delete();
+        alert(`✅ Student account for ${email} deleted successfully.`);
+      } catch (err) {
+        alert(`❌ Error deleting student: ${err.message}`);
+      }
+    }
+
+    /* ================= DELETE TRANSACTION RECORD ================= */
+    async function deleteTransaction(event, studentEmail, paymentId) {
+      if (event) event.stopPropagation();
+      if (!confirm(`⚠️ Are you sure you want to delete transaction ID ${paymentId} for ${studentEmail}?`)) return;
+
+      try {
+        const studentRef = db.collection('students').doc(studentEmail.toLowerCase());
+        const doc = await studentRef.get();
+        if (doc.exists) {
+          const data = doc.data();
+          const updatedTransactions = (data.transactions || []).filter(tx => tx.paymentId !== paymentId);
+          await studentRef.update({
+            transactions: updatedTransactions
+          });
+          alert(`✅ Transaction ${paymentId} deleted successfully.`);
+        }
+      } catch (err) {
+        alert(`❌ Error deleting transaction: ${err.message}`);
+      }
+    }
+
+    /* ================= EXPORT DATA TO EXCEL (CSV) ================= */
+    function exportTableToCSV() {
+      if (activeViewTab === 'students') {
+        let csv = ["Name,Email,Phone,Category,Org Code,Enrolled Courses Count,Latest Course,Latest Amount,Latest Payment ID,Joined Date"];
+        
+        allStudentsData.forEach(s => {
+          const orgDoc = orgsMap[(s.orgCode || "").toUpperCase().trim()] || {};
+          const cat = (s.targetType || orgDoc.targetType || "Individual").toUpperCase();
+          let latestTx = { paymentId: 'N/A', amount: 'N/A', courseTitle: 'N/A' };
+          if (s.transactions && s.transactions.length > 0) {
+            latestTx = s.transactions[s.transactions.length - 1];
+          }
+
+          const row = [
+            `"${s.name || ''}"`,
+            `"${s.email || ''}"`,
+            `"${s.phone || ''}"`,
+            `"${cat}"`,
+            `"${s.orgCode || 'INDIVIDUAL'}"`,
+            `"${s.enrolledCourses ? s.enrolledCourses.length : 0}"`,
+            `"${latestTx.courseTitle || ''}"`,
+            `"${latestTx.amount || ''}"`,
+            `"${latestTx.paymentId || ''}"`,
+            `"${s.joinedDate || ''}"`
+          ];
+          csv.push(row.join(","));
+        });
+
+        downloadCSVFile(csv.join("\n"), "Careergraspp_Students_Roster.csv");
+      } else if (activeViewTab === 'transactions') {
+        let csv = ["Payment ID,Student Email,Course Purchased,Amount,Date & Time"];
+        
+        allTransactionsData.forEach(tx => {
+          const row = [
+            `"${tx.paymentId}"`,
+            `"${tx.studentEmail}"`,
+            `"${tx.courseTitle}"`,
+            `"${tx.amount}"`,
+            `"${tx.date}"`
+          ];
+          csv.push(row.join(","));
+        });
+
+        downloadCSVFile(csv.join("\n"), "Careergraspp_Transactions_Log.csv");
+      } else {
+        alert("Please switch to Student Profiles or Transaction Logs tab to export.");
+      }
+    }
+
+    function downloadCSVFile(csvContent, fileName) {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", fileName);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function inspectStudent(email) {
       const student = allStudentsData.find(s => s.email.toLowerCase() === email.toLowerCase());
       if (!student) return;
 
+      const orgDoc = orgsMap[(student.orgCode || "").toUpperCase().trim()] || {};
+
       const modalContent = document.getElementById('modal-student-content');
       modalContent.innerHTML = `
-        <div class="bg-slate-50 p-3 rounded-xl space-y-1 border border-slate-200">
-          <p><strong>Name:</strong> ${student.name || 'N/A'}</p>
-          <p><strong>Email:</strong> ${student.email}</p>
-          <p><strong>Phone:</strong> ${student.phone || 'N/A'}</p>
-          <p><strong>Organization Code:</strong> ${student.orgCode || 'INDIVIDUAL'}</p>
-          <p><strong>Roll Number:</strong> ${student.rollNumber || 'N/A'}</p>
-          <p><strong>Joined Date:</strong> ${student.joinedDate || 'N/A'}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <div><span class="text-slate-400 block font-semibold">Full Name</span> <strong class="text-slate-900 text-sm">${student.name || 'N/A'}</strong></div>
+          <div><span class="text-slate-400 block font-semibold">Email Address</span> <strong class="text-slate-900 text-sm">${student.email}</strong></div>
+          <div><span class="text-slate-400 block font-semibold">Mobile Number</span> <strong class="text-slate-900 text-sm">${student.phone || 'N/A'}</strong></div>
+          <div><span class="text-slate-400 block font-semibold">Organization Code</span> <strong class="text-indigo-600 text-sm">${student.orgCode || 'INDIVIDUAL'}</strong></div>
+          <div><span class="text-slate-400 block font-semibold">Target Category</span> <strong class="text-slate-900 uppercase">${student.targetType || orgDoc.targetType || 'Individual'}</strong></div>
+          <div><span class="text-slate-400 block font-semibold">Joined Date</span> <strong class="text-slate-900">${student.joinedDate || 'N/A'}</strong></div>
         </div>
 
-        <div>
-          <h4 class="font-bold text-slate-900 mb-1">Enrolled Course IDs:</h4>
-          <p class="font-mono bg-slate-100 p-2 rounded text-[11px]">${JSON.stringify(student.enrolledCourses || [])}</p>
+        <div class="space-y-2">
+          <h4 class="font-extrabold text-slate-900 text-xs uppercase tracking-wider">Payment Transactions Log</h4>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2 max-h-36 overflow-y-auto">
+            ${(student.transactions || []).map(tx => `
+              <div class="flex justify-between items-center text-xs border-b border-slate-200 pb-1.5 last:border-0 last:pb-0">
+                <div>
+                  <span class="font-bold text-slate-800 block">${tx.courseTitle || 'Course #' + tx.courseId}</span>
+                  <span class="font-mono text-[10px] text-slate-400">${tx.paymentId}</span>
+                </div>
+                <span class="font-black text-emerald-600">₹${tx.amount}</span>
+              </div>
+            `).join('') || '<p class="text-slate-400">No explicit transaction record array found.</p>'}
+          </div>
         </div>
 
-        <div>
-          <h4 class="font-bold text-slate-900 mb-1">Completed Lesson Keys (${(student.completedLessons || []).length}):</h4>
-          <p class="font-mono bg-slate-100 p-2 rounded text-[11px] max-h-24 overflow-y-auto">${JSON.stringify(student.completedLessons || [])}</p>
+        <div class="space-y-2">
+          <h4 class="font-extrabold text-slate-900 text-xs uppercase tracking-wider">Enrolled Course IDs</h4>
+          <p class="font-mono bg-slate-100 p-2.5 rounded-xl text-[11px] text-slate-700">${JSON.stringify(student.enrolledCourses || [])}</p>
         </div>
       `;
 
@@ -390,20 +709,112 @@
       activeViewTab = tab;
       const btnStudents = document.getElementById('tab-btn-students');
       const btnTx = document.getElementById('tab-btn-transactions');
+      const btnSell = document.getElementById('tab-btn-sell-course');
+
       const containerStudents = document.getElementById('view-students-container');
       const containerTx = document.getElementById('view-transactions-container');
+      const containerSell = document.getElementById('view-sell-course-container');
+      const filterBar = document.getElementById('search-filter-controls');
+
+      [containerStudents, containerTx, containerSell].forEach(c => c.classList.add('hidden'));
+      
+      btnStudents.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+      btnTx.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+      btnSell.className = "px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
 
       if (tab === 'students') {
-        btnStudents.className = "px-5 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition font-bold";
-        btnTx.className = "px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        btnStudents.className = "px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition font-bold";
         containerStudents.classList.remove('hidden');
-        containerTx.classList.add('hidden');
-      } else {
-        btnTx.className = "px-5 py-2 rounded-lg bg-white text-emerald-600 shadow-sm transition font-bold";
-        btnStudents.className = "px-5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+        filterBar.classList.remove('hidden');
+      } else if (tab === 'transactions') {
+        btnTx.className = "px-4 py-2 rounded-lg bg-white text-emerald-600 shadow-sm transition font-bold";
         containerTx.classList.remove('hidden');
-        containerStudents.classList.add('hidden');
+        filterBar.classList.remove('hidden');
+      } else if (tab === 'sell-course') {
+        btnSell.className = "px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition font-bold";
+        containerSell.classList.remove('hidden');
+        filterBar.classList.add('hidden');
       }
+    }
+
+    /* ================= POPULATE SELL COURSE CHECKBOXES ================= */
+    function populateSellCourseCheckboxes() {
+      const container = document.getElementById('sell-course-checkbox-list');
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (!softSkillsCourses || softSkillsCourses.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400">No courses available.</p>`;
+        return;
+      }
+
+      softSkillsCourses.forEach((course) => {
+        container.innerHTML += `
+          <label class="flex items-center space-x-3 p-2 bg-white rounded-lg border border-slate-200 hover:border-indigo-300 cursor-pointer transition">
+            <input type="checkbox" name="sell-course-select" value="${course.id}" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+            <div class="text-xs">
+              <span class="font-bold text-slate-800">#${course.id} - ${course.title}</span>
+              <span class="text-slate-400 ml-1">(Default Price: ₹${course.price})</span>
+            </div>
+          </label>
+        `;
+      });
+    }
+
+    /* ================= GENERATE CAMPAIGN LINK HANDLER ================= */
+    async function generateCampaignLink(event) {
+      event.preventDefault();
+
+      const targetType = document.getElementById('sell-target-type').value;
+      const orgName = document.getElementById('sell-org-name').value.trim();
+      const rawOrgCode = document.getElementById('sell-org-code').value.trim().toUpperCase();
+      const customPrice = document.getElementById('sell-custom-price').value.trim();
+
+      const checkedBoxes = document.querySelectorAll('input[name="sell-course-select"]:checked');
+      const selectedCourseIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+      if (selectedCourseIds.length === 0) {
+        return alert("⚠️ Please select at least one course to offer!");
+      }
+
+      const courseIdsString = selectedCourseIds.join(',');
+
+      const baseUrl = window.location.origin + window.location.pathname.replace("admin-database.html", "index.html");
+
+      const generatedUrl = `${baseUrl}?org=${encodeURIComponent(rawOrgCode)}&type=${targetType}&courses=${courseIdsString}&price=${customPrice}`;
+
+      try {
+        await db.collection('organizations').doc(rawOrgCode).set({
+          orgCode: rawOrgCode,
+          orgName: orgName,
+          targetType: targetType,
+          allowedCourses: selectedCourseIds,
+          offeredPrice: Number(customPrice),
+          generatedLink: generatedUrl,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        console.warn("Could not save organization campaign rule to Firestore:", err);
+      }
+
+      document.getElementById('sell-generated-url').value = generatedUrl;
+      document.getElementById('sell-link-badge').textContent = `${selectedCourseIds.length} Course(s) @ ₹${customPrice}`;
+      document.getElementById('sell-link-output-box').classList.remove('hidden');
+    }
+
+    /* ================= COPY LINK TO CLIPBOARD ================= */
+    function copyGeneratedCampaignLink() {
+      const urlInput = document.getElementById('sell-generated-url');
+      urlInput.select();
+      urlInput.setSelectionRange(0, 99999);
+
+      navigator.clipboard.writeText(urlInput.value).then(() => {
+        alert("📋 Campaign Link copied to clipboard!");
+      }).catch(() => {
+        document.execCommand('copy');
+        alert("📋 Campaign Link copied to clipboard!");
+      });
     }
 
     function adminLogout() {
