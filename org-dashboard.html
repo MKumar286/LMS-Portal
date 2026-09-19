@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organization Dashboard - Careergraspp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <header class="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">🏢</span>
+        <div>
+          <h1 id="display-org-name" class="font-extrabold text-base leading-none">Organization Portal</h1>
+          <span id="display-org-code" class="text-[10px] text-emerald-400 font-bold tracking-widest uppercase">CODE: ---</span>
+        </div>
+      </div>
+      <button onclick="orgLogout()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+
+    <!-- METRICS OVERVIEW CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Enrolled Students</span>
+        <h3 id="stat-total-students" class="text-3xl font-black text-slate-900">0</h3>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Course Licenses</span>
+        <h3 id="stat-active-courses" class="text-3xl font-black text-indigo-600">0</h3>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avg Completion Rate</span>
+        <h3 id="stat-completion-rate" class="text-3xl font-black text-emerald-600">0%</h3>
+      </div>
+    </div>
+
+    <!-- STUDENT ROSTER TABLE -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-base font-extrabold text-slate-900">Institutional Student Roster</h2>
+        <span class="text-xs text-slate-500">Live synchronization with Firestore</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase font-bold text-[10px]">
+              <th class="p-3">Student Name</th>
+              <th class="p-3">Email Address</th>
+              <th class="p-3">Phone</th>
+              <th class="p-3">Enrolled Courses</th>
+              <th class="p-3">Joined Date</th>
+            </tr>
+          </thead>
+          <tbody id="org-student-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-400">Loading student records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBh9VQBgh3dSRug89_2NaVEOD7GPhHKvyE",
+      authDomain: "careergrasppfinal.firebaseapp.com",
+      projectId: "careergrasppfinal",
+      storageBucket: "careergrasppfinal.firebasestorage.app",
+      messagingSenderId: "243374148181",
+      appId: "1:243374148181:web:7f6a37b9ac71caf76022dc"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const orgCode = localStorage.getItem('careergraspp_org_code');
+    const orgName = localStorage.getItem('careergraspp_org_name');
+    const role = localStorage.getItem('careergraspp_role');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (role !== 'org' || !orgCode) {
+        alert("🔐 Organization login required.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      document.getElementById('display-org-name').textContent = orgName || "Organization Portal";
+      document.getElementById('display-org-code').textContent = `CODE: ${orgCode}`;
+      loadOrgStudents();
+    });
+
+    function loadOrgStudents() {
+      // Fetch only students belonging to this institution code
+      db.collection('students').where('orgCode', '==', orgCode).onSnapshot((snapshot) => {
+        const tbody = document.getElementById('org-student-table-body');
+        tbody.innerHTML = "";
+
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students currently registered under code: <strong>${orgCode}</strong></td></tr>`;
+          return;
+        }
+
+        let totalCoursesCount = 0;
+        let studentCount = snapshot.size;
+
+        snapshot.forEach((doc) => {
+          const s = doc.data();
+          const courses = s.enrolledCourses ? s.enrolledCourses.length : 0;
+          totalCoursesCount += courses;
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="p-3 font-bold text-slate-900">${s.name || 'N/A'}</td>
+              <td class="p-3 text-slate-600">${s.email}</td>
+              <td class="p-3 text-slate-600">${s.phone || 'N/A'}</td>
+              <td class="p-3 font-bold text-indigo-600">${courses} Program(s)</td>
+              <td class="p-3 text-slate-400">${s.joinedDate || 'Recent'}</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById('stat-total-students').textContent = studentCount;
+        document.getElementById('stat-active-courses').textContent = totalCoursesCount;
+        document.getElementById('stat-completion-rate').textContent = `${Math.round((totalCoursesCount / (studentCount * 4)) * 100) || 0}%`;
+      });
+    }
+
+    function orgLogout() {
+      localStorage.removeItem('careergraspp_role');
+      localStorage.removeItem('careergraspp_org_code');
+      localStorage.removeItem('careergraspp_org_name');
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
