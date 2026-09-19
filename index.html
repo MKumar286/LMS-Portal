@@ -94,8 +94,8 @@
   <section id="courses-section" class="py-16 bg-slate-50 border-t border-slate-200 w-full">
     <div class="w-full px-4 md:px-10 lg:px-12">
       <div class="text-center mb-16 space-y-3">
-        <h2 class="text-3xl font-extrabold text-slate-900">Featured Soft Skills Programs</h2>
-        <p class="text-sm text-slate-600 max-w-2xl mx-auto">Master essential corporate skills with our specialized programs. Click "View Course" to inspect syllabus & enrollment details.</p>
+        <h2 id="courses-grid-heading" class="text-3xl font-extrabold text-slate-900">Featured Soft Skills Programs</h2>
+        <p id="courses-grid-subheading" class="text-sm text-slate-600 max-w-2xl mx-auto">Master essential corporate skills with our specialized programs. Click "View Course" to inspect syllabus & enrollment details.</p>
       </div>
 
       <!-- 3 CARDS PER ROW GRID -->
@@ -295,6 +295,7 @@
           <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
           <input type="tel" id="reg-student-phone" required placeholder="+91 9876543210" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-600 focus:bg-white transition" />
         </div>
+
         <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/25 transition">
           Continue to Payment →
         </button>
@@ -341,8 +342,9 @@
     const db = firebase.firestore();
 
     /* 2. RAZORPAY KEY ID CONFIGURATION */
-    const RAZORPAY_KEY_ID = "rzp_test_TXFnqgy3pZvwzL"; // Replace with your live or test key ID from Razorpay Dashboard
+    const RAZORPAY_KEY_ID = "rzp_test_TXFnqgy3pZvwzL"; 
     let pendingCourseIdToEnroll = null;
+    let autoModalTriggered = false;
 
     const samplePdfLinks = [
       "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
@@ -478,6 +480,53 @@
 
     let softSkillsCourses = defaultCourses;
 
+    /* ================= AUTOMATIC URL CAMPAIGN LINK HANDLER ================= */
+    function applyCampaignUrlParameters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawCourses = urlParams.get('courses') || urlParams.get('course');
+      const customPrice = urlParams.get('price');
+      const orgCode = urlParams.get('org');
+
+      if (orgCode) {
+        localStorage.setItem('careergraspp_org_code', orgCode.toUpperCase().trim());
+      }
+
+      if (!rawCourses) return null;
+
+      const targetCourseIds = rawCourses.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+
+      if (targetCourseIds.length > 0) {
+        // 1. Override custom price if present
+        if (customPrice && !isNaN(customPrice) && Number(customPrice) > 0) {
+          const offerPrice = Number(customPrice);
+          softSkillsCourses.forEach(c => {
+            if (targetCourseIds.includes(c.id)) {
+              c.price = offerPrice;
+            }
+          });
+        }
+
+        // 2. Filter softSkillsCourses grid to show ONLY offered courses
+        const filtered = softSkillsCourses.filter(c => targetCourseIds.includes(c.id));
+        if (filtered.length > 0) {
+          softSkillsCourses = filtered;
+
+          // Update Section Headings to reflect campaign offer
+          const heading = document.getElementById('courses-grid-heading');
+          const subheading = document.getElementById('courses-grid-subheading');
+          if (heading && orgCode) {
+            heading.textContent = `Special Offer Program for ${orgCode}`;
+          }
+          if (subheading && customPrice) {
+            subheading.textContent = `Exclusive Institutional Pricing: Unlock your offered courses for only ₹${customPrice}!`;
+          }
+
+          return targetCourseIds;
+        }
+      }
+      return null;
+    }
+
     /* 3. REAL-TIME FIRESTORE SYNCHRONIZATION */
     function initFirestoreCoursesSync() {
       const container = document.getElementById('courses-grid-container');
@@ -485,21 +534,18 @@
         container.innerHTML = `<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 text-slate-500 font-semibold text-sm">🔄 Syncing live catalog from Firebase Firestore...</div>`;
       }
 
-      // Check local storage for immediate load
       const localCache = localStorage.getItem('careergraspp_courses');
       if (localCache) {
         try {
           const parsed = JSON.parse(localCache);
           if (Array.isArray(parsed) && parsed.length > 0) {
             softSkillsCourses = parsed;
-            renderCoursesGrid();
           }
         } catch (e) {
           console.warn("Invalid local cache", e);
         }
       }
 
-      // Real-time Firestore Listener
       try {
         db.collection('courses').orderBy('id', 'asc').onSnapshot((snapshot) => {
           if (!snapshot.empty) {
@@ -512,14 +558,34 @@
           } else {
             softSkillsCourses = defaultCourses;
           }
+
+          const campaignTargetIds = applyCampaignUrlParameters();
           renderCoursesGrid();
+
+          if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
+            autoModalTriggered = true;
+            const singleCourseId = campaignTargetIds[0];
+            setTimeout(() => {
+              openCourseModal(singleCourseId);
+            }, 400);
+          }
         }, (error) => {
           console.error("Firestore Error:", error);
+          const campaignTargetIds = applyCampaignUrlParameters();
           renderCoursesGrid();
+          if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
+            autoModalTriggered = true;
+            setTimeout(() => openCourseModal(campaignTargetIds[0]), 400);
+          }
         });
       } catch (err) {
         console.error("Firebase Connection Error:", err);
+        const campaignTargetIds = applyCampaignUrlParameters();
         renderCoursesGrid();
+        if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
+          autoModalTriggered = true;
+          setTimeout(() => openCourseModal(campaignTargetIds[0]), 400);
+        }
       }
     }
 
@@ -673,15 +739,20 @@
       document.getElementById('student-info-modal').classList.remove('hidden');
     }
 
+    /* HANDLE FORM SUBMISSION */
     function handleRegistrationSubmit(event) {
       event.preventDefault();
+
       const name = document.getElementById('reg-student-name').value.trim();
       const email = document.getElementById('reg-student-email').value.trim().toLowerCase();
       const phone = document.getElementById('reg-student-phone').value.trim();
 
-      if (!name || !email || !phone) return alert("Please fill in all fields!");
+      if (!name || !email || !phone) {
+        return alert("Please fill in all required fields!");
+      }
 
       document.getElementById('student-info-modal').classList.add('hidden');
+
       if (pendingCourseIdToEnroll) {
         initiateRazorpayPayment(pendingCourseIdToEnroll, name, email, phone);
       }
@@ -704,7 +775,13 @@
         "description": `Enrollment for ${course.title}`,
         "image": "careergraspplogo.jpg",
         "handler": function (response) {
-          onPaymentSuccess(response.razorpay_payment_id, course, studentName, studentEmail, studentPhone);
+          onPaymentSuccess(
+            response.razorpay_payment_id,
+            course,
+            studentName,
+            studentEmail,
+            studentPhone
+          );
         },
         "prefill": {
           "name": studentName,
@@ -727,81 +804,78 @@
     }
 
     /* ================= FIRESTORE PROFILE HELPER ================= */
-  /* ================= FIRESTORE PROFILE HELPER ================= */
-async function saveStudentProfileToFirestore(studentData) {
-  const email = studentData.email.toLowerCase();
-  const userDocRef = db.collection('students').doc(email);
+    async function saveStudentProfileToFirestore(studentData) {
+      const email = studentData.email.toLowerCase();
+      const userDocRef = db.collection('students').doc(email);
 
-  // Read directly from URL or fallback to storage
-  const urlParams = new URLSearchParams(window.location.search);
-  const rawOrgCode = urlParams.get('org') || localStorage.getItem('careergraspp_org_code') || studentData.orgCode;
-  
-  const assignedOrgCode = rawOrgCode ? rawOrgCode.toUpperCase().trim() : "INDIVIDUAL";
-  const isOrg = assignedOrgCode !== "INDIVIDUAL";
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawOrgCode = urlParams.get('org') || localStorage.getItem('careergraspp_org_code') || studentData.orgCode;
+      
+      const assignedOrgCode = rawOrgCode ? rawOrgCode.toUpperCase().trim() : "INDIVIDUAL";
+      const isOrg = assignedOrgCode !== "INDIVIDUAL";
 
-  await userDocRef.set({
-    name: studentData.name,
-    email: email,
-    phone: studentData.phone,
-    role: "student",
-    
-    // ORGANIZATION MATCHING FIELDS
-    orgCode: assignedOrgCode,
-    studentType: isOrg ? "organization" : "individual",
-    orgName: isOrg ? "Mahatma Gandhi Institute of Technology" : "Self Enrolled",
-    rollNumber: studentData.rollNumber || "N/A",
+      await userDocRef.set({
+        name: studentData.name,
+        email: email,
+        phone: studentData.phone,
+        role: "student",
 
-    enrolledCourses: firebase.firestore.FieldValue.arrayUnion(studentData.courseId),
-    courseEnrollmentDates: {
-      [studentData.courseId]: Date.now()
-    },
-    completedLessons: firebase.firestore.FieldValue.arrayUnion(),
-    transactions: firebase.firestore.FieldValue.arrayUnion({
-      paymentId: studentData.paymentId,
-      courseId: studentData.courseId,
-      courseTitle: studentData.courseTitle,
-      amount: studentData.amount,
-      date: new Date().toLocaleString(),
-      timestamp: Date.now()
-    }),
-    joinedDate: new Date().toLocaleDateString(),
-    joinedTimestamp: Date.now()
-  }, { merge: true });
+        // ORGANIZATION MATCHING FIELDS
+        orgCode: assignedOrgCode,
+        studentType: isOrg ? "organization" : "individual",
+        orgName: isOrg ? "Institutional Access" : "Self Enrolled",
+        rollNumber: studentData.rollNumber || "N/A",
 
-  // Save orgCode locally so student stays linked
-  if (isOrg) {
-    localStorage.setItem('careergraspp_org_code', assignedOrgCode);
-  }
-}
+        enrolledCourses: firebase.firestore.FieldValue.arrayUnion(studentData.courseId),
+        courseEnrollmentDates: {
+          [studentData.courseId]: Date.now()
+        },
+        completedLessons: firebase.firestore.FieldValue.arrayUnion(),
+        transactions: firebase.firestore.FieldValue.arrayUnion({
+          paymentId: studentData.paymentId,
+          courseId: studentData.courseId,
+          courseTitle: studentData.courseTitle,
+          amount: studentData.amount,
+          date: new Date().toLocaleString(),
+          timestamp: Date.now()
+        }),
+        joinedDate: new Date().toLocaleDateString(),
+        joinedTimestamp: Date.now()
+      }, { merge: true });
 
-/* ================= PAYMENT SUCCESS HANDLER ================= */
-async function onPaymentSuccess(paymentId, course, name, email, phone) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const detectedOrg = urlParams.get('org') || localStorage.getItem('careergraspp_org_code');
+      if (isOrg) {
+        localStorage.setItem('careergraspp_org_code', assignedOrgCode);
+      }
+    }
 
-  try {
-    await saveStudentProfileToFirestore({
-      paymentId: paymentId,
-      courseId: course.id,
-      courseTitle: course.title,
-      amount: course.price,
-      name: name,
-      email: email,
-      phone: phone,
-      orgCode: detectedOrg
-    });
+    /* ================= PAYMENT SUCCESS HANDLER ================= */
+    async function onPaymentSuccess(paymentId, course, name, email, phone) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const detectedOrg = urlParams.get('org') || localStorage.getItem('careergraspp_org_code');
 
-    localStorage.setItem('careergraspp_active_email', email);
-    localStorage.setItem('careergraspp_active_phone', phone);
-    localStorage.setItem('careergraspp_role', 'student');
+      try {
+        await saveStudentProfileToFirestore({
+          paymentId: paymentId,
+          courseId: course.id,
+          courseTitle: course.title,
+          amount: course.price,
+          name: name,
+          email: email,
+          phone: phone,
+          orgCode: detectedOrg
+        });
 
-    alert(`🎉 Payment Successful!\n\nWelcome ${name}!\nTransaction ID: ${paymentId}\nCourse Unlocked: ${course.title}\n\nRedirecting to your Student Portal...`);
-    window.location.href = `course.html?unlocked=${course.id}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
-  } catch (err) {
-    console.error("Firestore Error:", err);
-    alert(`Payment received, but error saving to Firebase: ${err.message}`);
-  }
-}
+        localStorage.setItem('careergraspp_active_email', email);
+        localStorage.setItem('careergraspp_active_phone', phone);
+        localStorage.setItem('careergraspp_role', 'student');
+
+        alert(`🎉 Payment Successful!\n\nWelcome ${name}!\nTransaction ID: ${paymentId}\nCourse Unlocked: ${course.title}\n\nRedirecting to your Student Portal...`);
+        window.location.href = `course.html?unlocked=${course.id}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+      } catch (err) {
+        console.error("Firestore Error:", err);
+        alert(`Payment received, but error saving to Firebase: ${err.message}`);
+      }
+    }
 
     function openUnifiedLoginModal(defaultRole) {
       if (!document.getElementById('login-dropdown-menu').classList.contains('hidden')) {
