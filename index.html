@@ -16,33 +16,59 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="bg-white text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-100 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white border-8 border-indigo-950/10">
 
-  <!-- ================= NAVIGATION BAR ================= -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm w-full">
+  <!-- ================= SMOOTH PAGE LOADING SPINNER ================= -->
+  <div id="page-loader" class="fixed inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center transition-opacity duration-300">
+    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="mt-4 text-xs font-bold text-indigo-900 tracking-wider uppercase animate-pulse">Loading Careergraspp Portal...</p>
+  </div>
+
+  <!-- ================= NAVIGATION BAR WITH BACK BUTTON SYMBOL ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-indigo-100 shadow-sm w-full">
     <div class="w-full px-4 md:px-10 lg:px-12 py-4 flex items-center justify-between">
       
-      <a href="index.html" class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-md shadow-indigo-500/20">
-          C
-        </div>
-        <div>
-          <span class="text-xl font-extrabold tracking-tight text-slate-900">Career<span class="text-indigo-600">graspp</span></span>
-          <span class="block text-[10px] text-slate-500 font-semibold tracking-widest uppercase -mt-1">Soft Skills Academy</span>
-        </div>
-      </a>
+      <div class="flex items-center space-x-3">
+        <!-- BACK BUTTON SYMBOL -->
+        <button onclick="history.back()" title="Go Back" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 border border-slate-200 flex items-center justify-center transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
 
-      <div class="flex items-center space-x-4">
-        <a href="#courses-section" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition flex items-center shadow-sm">
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center font-black text-white text-xl shadow-md shadow-indigo-500/20 group-hover:scale-105 transition">
+            C
+          </div>
+          <div>
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">Career<span class="text-indigo-600">graspp</span></span>
+            <span class="block text-[10px] text-slate-500 font-semibold tracking-widest uppercase -mt-1">Soft Skills Academy</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- MIDDLE NAVIGATION BUTTONS -->
+      <div class="hidden md:flex items-center space-x-3">
+        <a href="#courses-section" class="px-4 py-2 bg-indigo-50/60 hover:bg-indigo-100 text-indigo-900 border border-indigo-100 rounded-xl text-xs font-bold transition flex items-center shadow-sm">
           Courses
         </a>
+        <a href="#trainer-section" class="px-4 py-2 bg-indigo-50/60 hover:bg-indigo-100 text-indigo-900 border border-indigo-100 rounded-xl text-xs font-bold transition flex items-center shadow-sm">
+          About the Trainer
+        </a>
+        <a href="#org-section" class="px-4 py-2 bg-indigo-50/60 hover:bg-indigo-100 text-indigo-900 border border-indigo-100 rounded-xl text-xs font-bold transition flex items-center shadow-sm">
+          For Organizations
+        </a>
+      </div>
 
+      <div class="flex items-center space-x-4">
         <!-- MULTI-ROLE LOGIN DROPDOWN -->
-        <div class="relative inline-block text-left">
-          <button id="login-dropdown-btn" onclick="toggleLoginDropdown()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-indigo-600/20 flex items-center">
+        <div class="relative inline-block text-left" id="login-dropdown-wrapper">
+          <button id="login-dropdown-btn" onclick="toggleLoginDropdown()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-indigo-600/25 flex items-center">
             <span>Login Options</span>
             <svg class="w-4 h-4 ml-2 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
@@ -78,8 +104,21 @@
     </div>
   </header>
 
+  <!-- ================= HERO TOP INTRO SECTION (FROM IMAGE 1) ================= -->
+  <section class="w-full py-10 px-4 md:px-10 lg:px-12 text-center space-y-3">
+    <div class="inline-block px-4 py-1.5 bg-indigo-50 border border-indigo-200 rounded-full text-indigo-700 text-xs font-bold uppercase tracking-wider shadow-sm">
+      Transforming Careers & Lives
+    </div>
+    <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+      Master Soft Skills. <span class="text-indigo-600 block sm:inline">Unlock Unlimited Potential.</span>
+    </h1>
+    <p class="text-xs md:text-sm text-slate-600 max-w-3xl mx-auto font-medium">
+      Tailored Soft Skills & Personality Development training programs for Schools, Colleges, and Individual Students.
+    </p>
+  </section>
+
   <!-- ================= HERO BANNER ================= -->
-  <section class="w-full bg-white flex items-center justify-center my-4 px-4 md:px-10 lg:px-12">
+  <section class="w-full bg-white flex items-center justify-center mb-6 px-4 md:px-10 lg:px-12">
     <div class="w-full mx-auto flex items-center justify-center">
       <img 
         src="careergraspplogo.jpg" 
@@ -87,6 +126,39 @@
         alt="Careergraspp Main Banner" 
         class="w-full h-auto max-h-[75vh] object-contain rounded-2xl shadow-sm border border-slate-100" 
       />
+    </div>
+  </section>
+
+  <!-- ================= FOR ORGANIZATIONS SECTION (ORG-SEC) ================= -->
+  <section id="org-section" class="py-12 bg-white/60 border-t border-slate-200 w-full">
+    <div class="max-w-6xl mx-auto px-4 md:px-10">
+      <div class="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-4">
+          <span class="text-xs bg-indigo-500/30 text-indigo-300 border border-indigo-400/30 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Institutional Partnership</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Empower Your Students with Corporate Soft Skills</h2>
+          <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+            Partner with Careergraspp to deliver structured placement training, communication workshops, and resume masterclasses tailored for colleges, universities, and corporate cohorts.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <div class="flex items-center space-x-2 text-xs bg-white/10 px-3 py-1.5 rounded-xl">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Custom Bulk Pricing</span>
+            </div>
+            <div class="flex items-center space-x-2 text-xs bg-white/10 px-3 py-1.5 rounded-xl">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Org Analytics Dashboard</span>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-5 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 space-y-4">
+          <h3 class="font-bold text-base">Request Institutional Proposal</h3>
+          <form onsubmit="handleInstitutionalProposal(event)" class="space-y-3">
+            <input type="text" required placeholder="Institution Name" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-xs text-white placeholder-slate-300 focus:outline-none focus:bg-white/20" />
+            <input type="email" required placeholder="Contact Email" class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-xs text-white placeholder-slate-300 focus:outline-none focus:bg-white/20" />
+            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-lg">Submit Proposal Request →</button>
+          </form>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -105,6 +177,58 @@
     </div>
   </section>
 
+  <!-- ================= ABOUT THE CREATOR SECTION (DYNAMICALLY BELOW COURSES) ================= -->
+  <section id="trainer-section" class="py-16 bg-indigo-50/30 border-t border-indigo-100/60 w-full">
+    <div class="max-w-5xl mx-auto px-4 md:px-10">
+      <div class="bg-white border border-indigo-100 rounded-3xl p-6 md:p-10 shadow-lg grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+        <div class="md:col-span-4 flex flex-col items-center space-y-4">
+          <div class="w-56 h-64 rounded-2xl overflow-hidden bg-slate-100 shadow-md border border-slate-200 flex items-center justify-center">
+            <img src="arya.jpg" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=500&auto=format&fit=crop';" alt="Aarya Aakash - Creator" class="w-full h-full object-cover" />
+          </div>
+          <!-- YouTube & Instagram Social Links -->
+          <div class="flex items-center space-x-3 w-full justify-center">
+            <a href="https://youtube.com" target="_blank" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm space-x-1.5">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <span>YouTube</span>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="flex-1 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm space-x-1.5">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+        <div class="md:col-span-8 space-y-4 text-left">
+          <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">About the creator</h2>
+          <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">
+            <strong class="text-slate-900 font-bold">Aarya Aakash</strong> is an Academic Systems Designer, Career Orientation Facilitator, and English Communication Trainer with over 25 years of experience working with school students, college learners, job seekers, working professionals, and organizations.
+          </p>
+          <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">
+            His work focuses on designing structured learning systems that improve study habits, academic accuracy, communication clarity, productivity, and career readiness.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BOTTOM BRANDING SECTION (FROM IMAGE 4) ================= -->
+  <section class="py-16 bg-white border-t border-slate-200 w-full text-center">
+    <div class="max-w-4xl mx-auto px-4 space-y-6">
+      <div class="inline-block bg-slate-900 text-white px-8 py-6 rounded-2xl shadow-xl border border-slate-800 space-y-1">
+        <div class="text-xl md:text-2xl font-black tracking-wider">
+          <span class="text-amber-400">CAREER</span> <span class="text-indigo-400">GRASPP</span>
+        </div>
+        <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest font-bold">Learn | Lead | Level Up</p>
+      </div>
+      <div class="space-y-3">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Career Graspp</h2>
+        <div class="w-16 h-1 bg-indigo-600 mx-auto rounded-full"></div>
+        <p class="text-xs md:text-sm text-slate-600 max-w-2xl mx-auto font-medium">
+          Career Growth, Mind Performance, English Communication, & Test Preparation Systems for Students, Professionals and Organizations
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- ================= FULL SCREEN COURSE DETAIL MODAL ================= -->
   <div id="course-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm overflow-y-auto p-2 md:p-6">
     <div class="w-full bg-slate-50 rounded-3xl shadow-2xl overflow-hidden min-h-[90vh] flex flex-col border border-slate-200">
@@ -115,7 +239,7 @@
           Back to Courses List
         </button>
         <div class="flex items-center space-x-3">
-          <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold">Special Offer</span>
+          <span id="access-status-badge" class="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold">🔒 Locked (Enroll to Access)</span>
           <button onclick="closeCourseModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">&times;</button>
         </div>
       </div>
@@ -144,7 +268,7 @@
                 <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Course Video Parts & Sub-Lessons
               </h3>
-              <span class="text-xs text-indigo-600 font-semibold">Click any Part to expand lessons</span>
+              <span id="lessons-access-hint" class="text-xs text-amber-600 font-semibold">🔒 Enroll to Unlock Lessons</span>
             </div>
             <div id="modal-parts-accordion-list" class="space-y-4"></div>
           </div>
@@ -342,9 +466,22 @@
     const db = firebase.firestore();
 
     /* 2. RAZORPAY KEY ID CONFIGURATION */
-    const RAZORPAY_KEY_ID = "rzp_test_TXFnqgy3pZvwzL"; 
+    const RAZORPAY_KEY_ID = "rzp_live_TgMHALHpOxuBs0"; 
     let pendingCourseIdToEnroll = null;
     let autoModalTriggered = false;
+
+    // Dropdown close on outside click
+    window.addEventListener('click', function(e) {
+      const dropdownMenu = document.getElementById('login-dropdown-menu');
+      const dropdownBtn = document.getElementById('login-dropdown-btn');
+      const dropdownArrow = document.getElementById('dropdown-arrow');
+      if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+        if (!dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
+          dropdownMenu.classList.add('hidden');
+          if (dropdownArrow) dropdownArrow.classList.remove('rotate-180');
+        }
+      }
+    });
 
     const samplePdfLinks = [
       "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
@@ -480,6 +617,25 @@
 
     let softSkillsCourses = defaultCourses;
 
+    /* ================= CHECK STUDENT COURSE ACCESS ================= */
+    async function checkStudentCourseAccess(courseId) {
+      const activeEmail = localStorage.getItem('careergraspp_active_email');
+      const userRole = localStorage.getItem('careergraspp_role');
+      if (userRole === 'admin' || userRole === 'org') return true;
+      if (!activeEmail) return false;
+      try {
+        const doc = await db.collection('students').doc(activeEmail).get();
+        if (doc.exists) {
+          const data = doc.data();
+          const enrolled = data.enrolledCourses || [];
+          return enrolled.includes(Number(courseId)) || enrolled.includes(String(courseId));
+        }
+      } catch (e) {
+        console.error("Access check error:", e);
+      }
+      return false;
+    }
+
     /* ================= AUTOMATIC URL CAMPAIGN LINK HANDLER ================= */
     function applyCampaignUrlParameters() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -496,7 +652,6 @@
       const targetCourseIds = rawCourses.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
 
       if (targetCourseIds.length > 0) {
-        // 1. Override custom price if present
         if (customPrice && !isNaN(customPrice) && Number(customPrice) > 0) {
           const offerPrice = Number(customPrice);
           softSkillsCourses.forEach(c => {
@@ -506,12 +661,10 @@
           });
         }
 
-        // 2. Filter softSkillsCourses grid to show ONLY offered courses
         const filtered = softSkillsCourses.filter(c => targetCourseIds.includes(c.id));
         if (filtered.length > 0) {
           softSkillsCourses = filtered;
 
-          // Update Section Headings to reflect campaign offer
           const heading = document.getElementById('courses-grid-heading');
           const subheading = document.getElementById('courses-grid-subheading');
           if (heading && orgCode) {
@@ -527,7 +680,7 @@
       return null;
     }
 
-    /* 3. REAL-TIME FIRESTORE SYNCHRONIZATION */
+    /* 3. REAL-TIME FIRESTORE SYNCHRONIZATION & LOADER MANAGEMENT */
     function initFirestoreCoursesSync() {
       const container = document.getElementById('courses-grid-container');
       if (container) {
@@ -562,30 +715,36 @@
           const campaignTargetIds = applyCampaignUrlParameters();
           renderCoursesGrid();
 
-          if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
-            autoModalTriggered = true;
-            const singleCourseId = campaignTargetIds[0];
-            setTimeout(() => {
-              openCourseModal(singleCourseId);
-            }, 400);
-          }
-        }, (error) => {
-          console.error("Firestore Error:", error);
-          const campaignTargetIds = applyCampaignUrlParameters();
-          renderCoursesGrid();
+          // Hide Loader smoothly once data is rendered
+          setTimeout(() => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+              loader.style.opacity = '0';
+              setTimeout(() => loader.remove(), 300);
+            }
+          }, 300);
+
           if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
             autoModalTriggered = true;
             setTimeout(() => openCourseModal(campaignTargetIds[0]), 400);
           }
+        }, (error) => {
+          console.error("Firestore Error:", error);
+          applyCampaignUrlParameters();
+          renderCoursesGrid();
+          setTimeout(() => {
+            const loader = document.getElementById('page-loader');
+            if (loader) loader.remove();
+          }, 300);
         });
       } catch (err) {
         console.error("Firebase Connection Error:", err);
-        const campaignTargetIds = applyCampaignUrlParameters();
+        applyCampaignUrlParameters();
         renderCoursesGrid();
-        if (campaignTargetIds && campaignTargetIds.length === 1 && !autoModalTriggered) {
-          autoModalTriggered = true;
-          setTimeout(() => openCourseModal(campaignTargetIds[0]), 400);
-        }
+        setTimeout(() => {
+          const loader = document.getElementById('page-loader');
+          if (loader) loader.remove();
+        }, 300);
       }
     }
 
@@ -632,7 +791,7 @@
       initFirestoreCoursesSync();
     });
 
-    function openCourseModal(courseId) {
+    async function openCourseModal(courseId) {
       const course = softSkillsCourses.find(c => c.id === courseId);
       if (!course) return;
 
@@ -642,8 +801,29 @@
       document.getElementById('modal-course-original-price').textContent = `₹${course.originalPrice || Math.round(course.price * 1.5)}`;
       
       const enrollBtn = document.getElementById('modal-enroll-btn');
-      enrollBtn.textContent = `Pay ₹${course.price} & Enroll Now`;
-      enrollBtn.onclick = function() { startEnrollmentFlow(course.id); };
+      const isUnlocked = await checkStudentCourseAccess(course.id);
+      const statusBadge = document.getElementById('access-status-badge');
+      const lessonsHint = document.getElementById('lessons-access-hint');
+
+      if (isUnlocked) {
+        statusBadge.className = "text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold";
+        statusBadge.textContent = "🔓 Unlocked (Access Granted)";
+        lessonsHint.className = "text-xs text-emerald-600 font-semibold";
+        lessonsHint.textContent = "🔓 Lessons Unlocked";
+        enrollBtn.textContent = "Go to Enrolled Course Dashboard →";
+        enrollBtn.onclick = function() {
+          const activeEmail = localStorage.getItem('careergraspp_active_email') || "";
+          const activePhone = localStorage.getItem('careergraspp_active_phone') || "";
+          window.location.href = `course.html?unlocked=${course.id}&email=${encodeURIComponent(activeEmail)}&phone=${encodeURIComponent(activePhone)}`;
+        };
+      } else {
+        statusBadge.className = "text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold";
+        statusBadge.textContent = "🔒 Locked (Enroll to Access)";
+        lessonsHint.className = "text-xs text-amber-600 font-semibold";
+        lessonsHint.textContent = "🔒 Enroll to Unlock Lessons";
+        enrollBtn.textContent = `Pay ₹${course.price} & Enroll Now`;
+        enrollBtn.onclick = function() { startEnrollmentFlow(course.id); };
+      }
 
       const descContainer = document.getElementById('modal-course-desc');
       descContainer.innerHTML = "";
@@ -667,16 +847,22 @@
         let lessonsHtml = (part.lessons || []).map((les) => `
           <div class="p-3.5 bg-white border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-slate-800 shadow-sm">
             <div class="flex items-center space-x-3">
-              <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-bold flex items-center justify-center flex-shrink-0">${pIdx + 1}</span>
+              <span class="w-6 h-6 rounded-full ${isUnlocked ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'} text-[11px] font-bold flex items-center justify-center flex-shrink-0">${pIdx + 1}</span>
               <span class="text-xs font-semibold text-slate-800">${les.title} <span class="text-[10px] text-slate-500 font-normal">(${les.duration || '10 mins'})</span></span>
             </div>
             <div class="flex items-center space-x-2 flex-shrink-0">
-              <button onclick="playLessonVideo('${les.title.replace(/'/g, "\\'")}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                ▶ Play Video
-              </button>
-              <a href="${les.pdfUrl}" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition flex items-center">
-                📄 View PDF
-              </a>
+              ${isUnlocked ? `
+                <button onclick="playLessonVideo('${les.title.replace(/'/g, "\\'")}', '${les.videoUrl}', '${les.pdfUrl}')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                  ▶ Play Video
+                </button>
+                <a href="${les.pdfUrl}" target="_blank" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition flex items-center">
+                  📄 View PDF
+                </a>
+              ` : `
+                <span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold flex items-center">
+                  🔒 Locked Video & PDF
+                </span>
+              `}
             </div>
           </div>
         `).join('');
@@ -684,8 +870,8 @@
         accordionContainer.innerHTML += `
           <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
             <button onclick="togglePartAccordion('${partId}')" class="w-full p-4 bg-slate-100 text-slate-900 font-bold text-sm flex items-center justify-between hover:bg-slate-200 transition border-b border-slate-200">
-              <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600 mr-3"></span>${part.partTitle}</span>
-              <span class="text-xs text-indigo-600 font-semibold">Expand Video & PDF Access ▼</span>
+              <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full ${isUnlocked ? 'bg-emerald-600' : 'bg-amber-500'} mr-3"></span>${part.partTitle}</span>
+              <span class="text-xs text-indigo-600 font-semibold">${isUnlocked ? 'View Lessons ▼' : '🔒 Enroll to Unlock ▼'}</span>
             </button>
             <div id="${partId}" class="p-4 bg-slate-50 space-y-3 hidden">${lessonsHtml}</div>
           </div>
@@ -820,7 +1006,6 @@
         phone: studentData.phone,
         role: "student",
 
-        // ORGANIZATION MATCHING FIELDS
         orgCode: assignedOrgCode,
         studentType: isOrg ? "organization" : "individual",
         orgName: isOrg ? "Institutional Access" : "Self Enrolled",
@@ -1053,6 +1238,12 @@
     function toggleLoginDropdown() {
       document.getElementById('login-dropdown-menu').classList.toggle('hidden');
       document.getElementById('dropdown-arrow').classList.toggle('rotate-180');
+    }
+
+    function handleInstitutionalProposal(event) {
+      event.preventDefault();
+      alert("Proposal Request Submitted Successfully!");
+      event.target.reset();
     }
   </script>
 </body>
